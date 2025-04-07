@@ -40,9 +40,10 @@ namespace eBookStore.Web.Controllers
                 var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, false);
                 if (result.Succeeded)
                 {
+                    TempData["ToastrMessage"] = "Login successful. Welcome back!";
+                    TempData["ToastrType"] = "success";
                     return RedirectUser(loginVM.RedirectUrl);
                 }
-
                 _logger.LogWarning("Failed login attempt for {Email}.", loginVM.Email);
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
@@ -54,6 +55,8 @@ namespace eBookStore.Web.Controllers
         {
             var userName = User.Identity?.Name;
             await _signInManager.SignOutAsync();
+            TempData["ToastrMessage"] = $"Goodbye, {userName}. You have been logged out.";
+            TempData["ToastrType"] = "success";
             return RedirectToAction("Index", "Home");
         }
 
@@ -68,6 +71,9 @@ namespace eBookStore.Web.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    TempData["ToastrMessage"] = "Registration successful. Welcome!";
+                    TempData["ToastrType"] = "success";
+
                     return RedirectUser(registerVM.RedirectUrl);
                 }
 
