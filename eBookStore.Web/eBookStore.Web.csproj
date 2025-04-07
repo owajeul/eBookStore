@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\eBookStore.Application\eBookStore.Application.csproj" />
+    <ProjectReference Include="..\eBookStore.Infrastructure\eBookStore.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
