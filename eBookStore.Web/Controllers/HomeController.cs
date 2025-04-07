@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using eBookStore.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBookStore.Web.Controllers
@@ -18,6 +19,7 @@ namespace eBookStore.Web.Controllers
             return View();
         }
 
+        [Authorize(Roles ="Admin")]
         public IActionResult Privacy()
         {
             return View();
