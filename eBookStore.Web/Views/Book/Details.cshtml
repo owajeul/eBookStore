@@ -1,0 +1,57 @@
+﻿@model Book
+
+@{
+    ViewData["Title"] = "Book Details";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-info text-white text-center fs-4">
+            Book Details
+        </div>
+        <div class="card-body">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="text-center mb-4">
+                        <img src="@Model.ImageUrl" alt="Book Cover" class="img-fluid rounded" style="max-height: 300px;" />
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Title:</div>
+                        <div class="col-sm-8">@Model.Title</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Author:</div>
+                        <div class="col-sm-8">@Model.Author</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Genre:</div>
+                        <div class="col-sm-8">@Model.Genre</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Price:</div>
+                        <div class="col-sm-8">@Model.Price.ToString("C")</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Stock:</div>
+                        <div class="col-sm-8">@Model.Stock</div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-semibold">Description:</div>
+                        <div class="col-sm-8">@Model.Description</div>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">Edit</a>
+                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

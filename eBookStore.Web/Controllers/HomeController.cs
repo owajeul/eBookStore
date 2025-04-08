@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using eBookStore.Infrastructure.Repositories;
 using eBookStore.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,13 +8,6 @@ namespace eBookStore.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
         {
             return View();

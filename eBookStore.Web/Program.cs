@@ -1,5 +1,7 @@
+using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Data.Identity;
+using eBookStore.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -15,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddScoped<Repository<Book>>();
 builder.Services.AddScoped<DbInitializer>();
 
 builder.Services.Configure<IdentityOptions>(options =>
