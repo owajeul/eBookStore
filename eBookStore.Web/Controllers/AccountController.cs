@@ -1,4 +1,5 @@
-﻿using eBookStore.Infrastructure.Data.Identity;
+﻿using eBookStore.Application.Common.Utilily;
+using eBookStore.Infrastructure.Data.Identity;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,12 @@ namespace eBookStore.Web.Controllers
                 {
                     TempData["ToastrMessage"] = "Login successful. Welcome back!";
                     TempData["ToastrType"] = "success";
+
+                    var user = await _userManager.FindByEmailAsync(loginVM.Email);
+                    if(await _userManager.IsInRoleAsync(user, AppConstant.Role_Admin))
+                    {
+                        return RedirectToAction("Index", "Dashboard");
+                    }
                     return RedirectUser(loginVM.RedirectUrl);
                 }
                 _logger.LogWarning("Failed login attempt for {Email}.", loginVM.Email);
