@@ -1,3 +1,60 @@
-﻿@{
+﻿@model HomeVM
+@{
     ViewData["Title"] = "Home Page";
 }
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Featured Books</h2>
+    <form method="get" class="mb-3 row justify-content-start">
+
+        <div class="col-auto">
+            <select class="form-select ms-4" name="category" onchange="this.form.submit()" id="category">
+                @if(string.IsNullOrEmpty(Model.SelectedCategory)) 
+                {
+                    <option value="" selected>All</option>
+                }
+                else
+                {
+                    <option value="">All</option>
+                }
+
+                @foreach (var category in Model.BookCategories)
+                {
+                    if(category == Model.SelectedCategory)
+                    {
+                        <option value="@category" selected>
+                            @category
+                        </option>
+                    }
+                    else
+                    {
+                        <option value="@category">
+                            @category
+                        </option>
+                    }
+                }
+            </select>
+        </div>
+    </form>
+
+
+    <div class="row justify-content-center">
+
+        @foreach(var book in Model.Books)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4 p-2 m-2 rounded-3" style="border:1px solid lightgray;">
+                <div class="card h-100 shadow-sm border-0 rounded-4">
+                    <img src="@book.ImageUrl" class="card-img-top rounded-top-4" style="height: 250px; object-fit: cover;" alt="@book.Title" />
+                    <div class="card-body text-center">
+                        <h5 class="card-title text-primary fw-bold">@book.Title</h5>
+                        <p class="text-muted mb-1">@book.Author</p>
+                        <div class="text-warning">★★★★☆</div>
+                        <h6 class="text-success fw-semibold">$@book.Price</h6>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 p-0">
+                        <button class="btn btn-success rounded-0 rounded-bottom-4 w-100">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

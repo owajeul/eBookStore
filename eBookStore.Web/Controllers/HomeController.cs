@@ -1,28 +1,37 @@
 using System.Diagnostics;
-using eBookStore.Infrastructure.Repositories;
+using eBookStore.Application.Services.Implementations;
 using eBookStore.Web.Models;
-using Microsoft.AspNetCore.Authorization;
+using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace eBookStore.Web.Controllers
+namespace eBookStore.Web.Controllers;
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly BookService _bookService;
+    public HomeController(BookService bookService)
     {
-        public IActionResult Index()
+        _bookService = bookService;
+    }
+    public async Task<IActionResult> Index(string? category)
+    {
+        var books = await _bookService.GetAllBooksAsync(category);
+        var bookCategories = await _bookService.GetAllCategoriesAsync();
+        var homeVM = new HomeVM
         {
-            return View();
-        }
+            Books = books,
+            BookCategories = bookCategories,
+            SelectedCategory = category
+        };
+        return View(homeVM);
+    }
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-        [Authorize(Roles ="Admin")]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
