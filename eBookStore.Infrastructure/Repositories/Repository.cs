@@ -9,7 +9,7 @@ using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace eBookStore.Infrastructure.Repositories;
-public class Repository<T> : BookRepository<T> where T : class
+public class Repository<T> :IRepository<T> where T : class
 {
     private readonly AppDbContext _db;
     internal DbSet<T> _dbSet;

@@ -1,0 +1,80 @@
+﻿@model Cart
+@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4 text-primary fw-bold">Your Shopping Cart</h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="list-group">
+
+                @foreach(var catrItem in Model.CartItems)
+                {
+                    <div class="list-group-item border rounded-3 mb-3 p-3 shadow-sm">
+                        <div class="row align-items-center">
+                            <div class="col-md-6 d-flex align-items-center">
+                                <img src="@catrItem.Book.ImageUrl" class="rounded me-3" alt="The Great Gatsby" style="height: 100px;">
+                                <div>
+                                    <h5 class="mb-1 fw-semibold">@catrItem.Book.Title</h5>
+                                    <p class="mb-1 text-muted">by @catrItem.Book.Author</p>
+                                    <p class="mb-0"><span class="text-muted">Price:</span> $@catrItem.Book.Price</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex justify-content-center align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <a 
+                                       asp-action="DecreaseBookQuantity"
+                                       asp-route-cartId="@Model.Id"
+                                       asp-route-bookId="@catrItem.BookId"
+                                       class="btn btn-sm btn-outline-secondary"><i class="bi bi-dash-lg"></i></a>
+
+                                    <span class="fw-bold px-3 py-1 rounded border">@catrItem.Quantity</span>
+
+                                    <a 
+                                        asp-action="IncreaseBookQuantity" 
+                                        asp-route-cartId="@Model.Id" 
+                                        asp-route-bookId="@catrItem.BookId" 
+                                        class="btn btn-sm btn-outline-secondary"><i class="bi bi-plus-lg"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex justify-content-end align-items-center">
+                                <a 
+                                    asp-action="DeleteCartItem"
+                                    asp-route-cartId="@Model.Id"
+                                    asp-route-bookId="@catrItem.BookId"
+                                    class="btn btn-sm btn-outline-danger"><i class="bi bi-trash3"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">Order Summary</h5>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Subtotal</span>
+                            <span>$67.96</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Shipping</span>
+                            <span>$4.99</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between fw-bold">
+                            <span>Total</span>
+                            <span>$72.95</span>
+                        </li>
+                    </ul>
+                    <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary w-100">Proceed to Checkout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

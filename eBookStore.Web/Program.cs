@@ -16,7 +16,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddScoped<BookService>();
+
 builder.Services.AddScoped<BookRepository>();
+
+builder.Services.AddScoped<CartRepository>();
+builder.Services.AddScoped<CartService>();
 
 builder.Services.AddScoped<DbInitializer>();
 

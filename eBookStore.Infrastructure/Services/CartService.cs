@@ -1,0 +1,88 @@
+﻿using eBookStore.Domain.Entities;
+using eBookStore.Infrastructure.Repositories;
+
+public class CartService
+{
+    private readonly CartRepository _cartRepository;
+
+    public CartService(CartRepository cartRepository)
+    {
+        _cartRepository = cartRepository;
+    }
+    public async Task<Cart?> GetUserCartAsync(string userId)
+    {
+        return await _cartRepository.GetUserCartAsync(userId);
+    }
+
+    public async Task<Cart> GetUserCartWithItemsAsync(string userId)
+    {
+        return await _cartRepository.GetUserCartWithItemsAsync(userId)
+            ?? new Cart { UserId = userId, CartItems = new List<CartItem>(), CreatedAt = DateTime.UtcNow };
+    }
+
+    public async Task AddToCartAsync(string userId, int bookId)
+    {
+        var cart = await _cartRepository.GetUserCartWithItemsAsync(userId);
+
+        if (cart == null)
+        {
+            cart = new Cart
+            {
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                CartItems = new List<CartItem>()
+            };
+            await _cartRepository.Add(cart);
+        }
+
+        var existingItem = cart.CartItems.FirstOrDefault(ci => ci.BookId == bookId);
+   
+        var price = cart.CartItems.FirstOrDefault(ci => ci.BookId == bookId)?.UnitPrice ?? 0;
+
+        cart.CartItems.Add(new CartItem
+        {
+            BookId = bookId,
+            Quantity = 1,
+            UnitPrice = price
+        });
+
+        await _cartRepository.Save();
+    }
+
+    public async Task<bool> IsBookInCartAsync(string userId, int bookId)
+    {
+        var cart = await _cartRepository.GetUserCartWithItemsAsync(userId);
+        return cart?.CartItems.Any(ci => ci.BookId == bookId) ?? false;
+    }
+
+    public async Task IncreaseQuantityAsync(int cartId, int bookId)
+    {
+        var item = await _cartRepository.GetCartItemAsync(cartId, bookId);
+        if (item == null) return;
+        item.Quantity++;
+        _cartRepository.UpdateCartItem(item);
+        await _cartRepository.Save();
+    }
+
+    public async Task DecreaseQuantityAsync(int cartId, int bookId)
+    {
+        var item = await _cartRepository.GetCartItemAsync(cartId, bookId);
+
+        if (item != null && item.Quantity > 1)
+        {
+            item.Quantity--;
+            _cartRepository.UpdateCartItem(item);
+        }
+        await _cartRepository.Save();
+    }
+
+    public async Task RemoveFromCartAsync(int cartId, int bookId)
+    {
+        var cartItem = await _cartRepository.GetCartItemAsync(cartId, bookId);
+        if (cartItem != null)
+        {
+            _cartRepository.RemoveCartItem(cartItem);
+        }
+        await _cartRepository.Save();
+    }
+}
