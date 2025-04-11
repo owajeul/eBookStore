@@ -51,7 +51,7 @@
                         <h6 class="text-success fw-semibold">$@book.Price</h6>
                     </div>
                     <div class="card-footer bg-transparent border-0 p-0">
-                        <button class="btn btn-success rounded-0 rounded-bottom-4 w-100">Add to Cart</button>
+                        <a asp-action="Details" asp-controller="Book" asp-route-id="@book.Id" class="btn btn-success rounded-0 rounded-bottom-4 w-100">Details</a>
                     </div>
                 </div>
             </div>

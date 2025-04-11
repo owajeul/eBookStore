@@ -30,4 +30,9 @@ public class BookService
         var books = await _bookRepository.GetAllAsync();
         return books.Select(b => b.Genre).Distinct().ToList();
     }
+
+    public async Task<Book> GetBookAsync(int id)
+    {
+        return await _bookRepository.Get(b => b.Id == id);
+    }
 }
