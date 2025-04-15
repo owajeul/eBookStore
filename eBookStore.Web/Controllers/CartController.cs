@@ -22,6 +22,16 @@ namespace eBookStore.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var cart = await _cartService.GetUserCartWithItemsAsync(_userManager.GetUserId(User));
+            decimal subtotal = 0;
+            decimal shippingCosts = 0;
+            foreach (var item in cart.CartItems)
+            {
+                subtotal += item.Quantity * item.UnitPrice;
+            }
+
+            ViewBag.Subtotal = subtotal;
+            ViewBag.ShippingCosts = shippingCosts;
+            ViewBag.TotalCosts = subtotal + shippingCosts;
             return View(cart);
         }
 

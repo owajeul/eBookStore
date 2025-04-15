@@ -15,4 +15,9 @@ public class BookRepository : Repository<Book>
     {
         _db = db;
     }
+    public async Task<decimal> GetBookPriceAsync(int bookId)
+    {
+        var book = await _db.Books.FindAsync(bookId);
+        return book.Price;
+    }
 }

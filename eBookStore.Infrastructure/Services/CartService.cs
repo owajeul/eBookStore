@@ -4,10 +4,11 @@ using eBookStore.Infrastructure.Repositories;
 public class CartService
 {
     private readonly CartRepository _cartRepository;
-
-    public CartService(CartRepository cartRepository)
+    private readonly BookRepository _bookRepository;
+    public CartService(CartRepository cartRepository, BookRepository bookRepository)
     {
         _cartRepository = cartRepository;
+        _bookRepository = bookRepository;
     }
     public async Task<Cart?> GetUserCartAsync(string userId)
     {
@@ -35,9 +36,8 @@ public class CartService
             await _cartRepository.Add(cart);
         }
 
-        var existingItem = cart.CartItems.FirstOrDefault(ci => ci.BookId == bookId);
+        decimal price = await _bookRepository.GetBookPriceAsync(bookId);
    
-        var price = cart.CartItems.FirstOrDefault(ci => ci.BookId == bookId)?.UnitPrice ?? 0;
 
         cart.CartItems.Add(new CartItem
         {
