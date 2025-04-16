@@ -2,7 +2,7 @@
 
 namespace eBookStore.Infrastructure.Repositories
 {
-    public interface BookRepository<T> where T : class
+    public interface IRepository<T> where T : class
     {
         Task Add(T entity);
         Task<T> Get(Expression<Func<T, bool>> filter);

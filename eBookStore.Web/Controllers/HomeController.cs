@@ -12,15 +12,15 @@ public class HomeController : Controller
     {
         _bookService = bookService;
     }
-    public async Task<IActionResult> Index(string? category)
+    public async Task<IActionResult> Index(string? genre)
     {
-        var books = await _bookService.GetAllBooksAsync(category);
-        var bookCategories = await _bookService.GetAllCategoriesAsync();
+        var books = await _bookService.GetAllBooksAsync(genre);
+        var bookGenres = await _bookService.GetAllGenresAsync();
         var homeVM = new HomeVM
         {
             Books = books,
-            BookCategories = bookCategories,
-            SelectedCategory = category
+            BookGenres = bookGenres,
+            SelectedGenre = genre
         };
         return View(homeVM);
     }

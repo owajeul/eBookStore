@@ -10,15 +10,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eBookStore.Infrastructure.Repositories;
 
-public class Repository<T> : BookRepository<T> where T : class
+public class Repository<T> : IRepository<T> where T : class
 {
-    private readonly AppDbContext _db;
+    private readonly AppDbContext _dbContext;
     internal DbSet<T> _dbSet;
 
-    public Repository(AppDbContext db)
+    public Repository(AppDbContext dbContext)
     {
-        _db = db;
-        _dbSet = db.Set<T>();
+        _dbContext = dbContext;
+        _dbSet = _dbContext.Set<T>();
     }
     public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
     {
@@ -42,19 +42,19 @@ public class Repository<T> : BookRepository<T> where T : class
 
     public async Task Add(T entity)
     {
-        await _db.AddAsync(entity);
+        await _dbContext.AddAsync(entity);
     }
     public void Update(T entity)
     {
-        _db.Update(entity);
+        _dbContext.Update(entity);
     }
     public void Remove(T entity)
     {
-        _db.Remove(entity);
+        _dbContext.Remove(entity);
     }
     public async Task Save()
     {
-        await _db.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
     }
 }
 

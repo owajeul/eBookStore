@@ -25,7 +25,7 @@ public class BookService
         return await _bookRepository.GetAllAsync();
     }
 
-    public async Task<IEnumerable<string>> GetAllCategoriesAsync()
+    public async Task<IEnumerable<string>> GetAllGenresAsync()
     {
         var books = await _bookRepository.GetAllAsync();
         return books.Select(b => b.Genre).Distinct().ToList();

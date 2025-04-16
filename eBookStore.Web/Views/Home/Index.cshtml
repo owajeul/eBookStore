@@ -7,8 +7,8 @@
     <form method="get" class="mb-3 row justify-content-start">
 
         <div class="col-auto">
-            <select class="form-select ms-4" name="category" onchange="this.form.submit()" id="category">
-                @if(string.IsNullOrEmpty(Model.SelectedCategory)) 
+            <select class="form-select ms-4" name="genre" onchange="this.form.submit()" id="genre">
+                @if(string.IsNullOrEmpty(Model.SelectedGenre)) 
                 {
                     <option value="" selected>All</option>
                 }
@@ -17,9 +17,9 @@
                     <option value="">All</option>
                 }
 
-                @foreach (var category in Model.BookCategories)
+                @foreach (var category in Model.BookGenres)
                 {
-                    if(category == Model.SelectedCategory)
+                    if(category == Model.SelectedGenre)
                     {
                         <option value="@category" selected>
                             @category

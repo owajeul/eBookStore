@@ -10,9 +10,9 @@ namespace eBookStore.Infrastructure.Repositories;
 
 public class BookRepository : Repository<Book>
 {
-    private readonly AppDbContext _db;
-    public BookRepository(AppDbContext db): base(db)
+    private readonly AppDbContext _dbContext;
+    public BookRepository(AppDbContext dbContext): base(dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
 }
