@@ -1,12 +1,10 @@
-using eBookStore.Domain.Entities;
+using eBookStore.Application.Services.Implementations;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Data.Identity;
 using eBookStore.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Serilog.Extensions.Hosting;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,7 +15,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-builder.Services.AddScoped<Repository<Book>>();
+builder.Services.AddScoped<BookService>();
+builder.Services.AddScoped<BookRepository>();
+
 builder.Services.AddScoped<DbInitializer>();
 
 builder.Services.Configure<IdentityOptions>(options =>

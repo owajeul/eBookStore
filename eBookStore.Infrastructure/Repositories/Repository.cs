@@ -8,54 +8,53 @@ using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace eBookStore.Infrastructure.Repositories
+namespace eBookStore.Infrastructure.Repositories;
+
+public class Repository<T> : IRepository<T> where T : class
 {
-    public class Repository<T> : IRepository<T> where T : class
+    private readonly AppDbContext _dbContext;
+    internal DbSet<T> _dbSet;
+
+    public Repository(AppDbContext dbContext)
     {
-        private readonly AppDbContext _db;
-        internal DbSet<T> _dbSet;
+        _dbContext = dbContext;
+        _dbSet = _dbContext.Set<T>();
+    }
+    public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
+    {
+        IQueryable<T> query = _dbSet;
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        return query.ToListAsync();
+    }
 
-        public Repository(AppDbContext db)
+    public Task<T> Get(Expression<Func<T, bool>> filter)
+    {
+        IQueryable<T> query = _dbSet;
+        if (filter != null)
         {
-            _db = db;
-            _dbSet = db.Set<T>();
+            query = query.Where(filter);
         }
-        public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
-        {
-            IQueryable<T> query = _dbSet;
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            return query.ToListAsync();
-        }
+        return query.FirstOrDefaultAsync();
+    }
 
-        public Task<T> Get(Expression<Func<T, bool>> filter)
-        {
-            IQueryable<T> query = _dbSet;
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-            return query.FirstOrDefaultAsync();
-        }
-
-        public async Task Add(T entity)
-        {
-            await _db.AddAsync(entity);
-        }
-        public void Update(T entity)
-        {
-            _db.Update(entity);
-        }
-        public void Remove(T entity)
-        {
-            _db.Remove(entity);
-        }
-        public async Task Save()
-        {
-            await _db.SaveChangesAsync();
-        }
+    public async Task Add(T entity)
+    {
+        await _dbContext.AddAsync(entity);
+    }
+    public void Update(T entity)
+    {
+        _dbContext.Update(entity);
+    }
+    public void Remove(T entity)
+    {
+        _dbContext.Remove(entity);
+    }
+    public async Task Save()
+    {
+        await _dbContext.SaveChangesAsync();
     }
 }
 
