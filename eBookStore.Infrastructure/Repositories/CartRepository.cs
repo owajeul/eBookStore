@@ -31,7 +31,12 @@ public class CartRepository : Repository<Cart>, ICartRepository
     {
         return await _dbContext.CartItems.FirstOrDefaultAsync(ci => ci.CartId == cartId && ci.BookId == bookId);
     }
-
+    public async Task<bool> IsBookInCartAsync(string userId, int bookId)
+    {
+        return await _dbContext.Carts
+            .Include(c => c.CartItems)
+            .AnyAsync(c => c.UserId == userId && c.CartItems.Any(ci => ci.BookId == bookId));
+    }
     public void UpdateCartItem(CartItem cartItem)
     {
         _dbContext.CartItems.Update(cartItem);

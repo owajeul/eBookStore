@@ -53,8 +53,7 @@ public class CartService : ICartService
 
     public async Task<bool> IsBookInCartAsync(string userId, int bookId)
     {
-        var cart = await _cartRepository.GetUserCartWithItemsAsync(userId);
-        return cart?.CartItems.Any(ci => ci.BookId == bookId) ?? false;
+        return await _cartRepository.IsBookInCartAsync(userId, bookId);
     }
 
     public async Task IncreaseQuantityAsync(int cartId, int bookId)
