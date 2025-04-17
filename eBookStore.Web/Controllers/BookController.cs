@@ -1,13 +1,13 @@
 ﻿
-using eBookStore.Application.Services.Implementations;
+using eBookStore.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 namespace eBookStore.Web.Controllers;
 
 public class BookController : Controller
 {
-    private readonly BookService _bookService;
+    private readonly IBookService _bookService;
 
-    public BookController(BookService bookService)
+    public BookController(IBookService bookService)
     {
         _bookService = bookService;
     }

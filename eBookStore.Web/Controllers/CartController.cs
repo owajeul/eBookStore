@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
+using eBookStore.Application.Common.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Data.Identity;
+using eBookStore.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +14,9 @@ namespace eBookStore.Web.Controllers
     [Authorize]
     public class CartController : Controller
     {
-        private readonly CartService _cartService;
+        private readonly ICartService _cartService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public CartController(CartService cartService, UserManager<ApplicationUser> userManager)
+        public CartController(ICartService cartService, UserManager<ApplicationUser> userManager)
         {
             _cartService = cartService;
             _userManager = userManager;

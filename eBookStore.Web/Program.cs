@@ -1,7 +1,9 @@
-using eBookStore.Application.Services.Implementations;
+using eBookStore.Application.Common.Interfaces;
+using eBookStore.Application.Services;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Data.Identity;
 using eBookStore.Infrastructure.Repositories;
+using eBookStore.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -15,12 +17,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-builder.Services.AddScoped<BookService>();
 
-builder.Services.AddScoped<BookRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-builder.Services.AddScoped<CartRepository>();
-builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped<DbInitializer>();
 

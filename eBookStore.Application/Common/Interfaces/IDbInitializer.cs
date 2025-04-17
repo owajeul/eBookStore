@@ -1,8 +1,7 @@
 ﻿
-namespace eBookStore.Infrastructure.Data
+namespace eBookStore.Application.Common.Interfaces;
+
+public interface IDbInitializer
 {
-    public interface IDbInitializer
-    {
-        Task Initialize();
-    }
+    Task Initialize();
 }

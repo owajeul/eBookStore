@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eBookStore.Application.Common.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 
 namespace eBookStore.Infrastructure.Repositories;
 
-public class BookRepository : Repository<Book>
+public class BookRepository : Repository<Book>, IBookRepository
 {
-    private readonly AppDbContext _db;
-    public BookRepository(AppDbContext db): base(db)
+    private readonly AppDbContext _dbContext;
+    public BookRepository(AppDbContext dbContext) : base(dbContext)
     {
-        _db = db;
+        _dbContext = dbContext;
     }
     public async Task<decimal> GetBookPriceAsync(int bookId)
     {
-        var book = await _db.Books.FindAsync(bookId);
+        var book = await _dbContext.Books.FindAsync(bookId);
         return book.Price;
     }
 }

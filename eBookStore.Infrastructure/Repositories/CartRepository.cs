@@ -1,11 +1,11 @@
-﻿using eBookStore.Domain.Entities;
+﻿using eBookStore.Application.Common.Interfaces;
+using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 namespace eBookStore.Infrastructure.Repositories;
 
-public class CartRepository : Repository<Cart>
+public class CartRepository : Repository<Cart>, ICartRepository
 {
     private readonly AppDbContext _dbContext;
 

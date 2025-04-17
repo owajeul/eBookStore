@@ -1,24 +1,25 @@
-﻿using eBookStore.Domain.Entities;
+﻿using eBookStore.Application.Common.Interfaces;
+using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBookStore.Web.Controllers;
 public class AdminBookController : Controller
 {
-    private readonly Repository<Book> _repository;
-    public AdminBookController(Repository<Book> repository)
+    private readonly IBookRepository _bookRepository;
+    public AdminBookController(IBookRepository bookRepository)
     {
-        _repository = repository;
+        _bookRepository = bookRepository;
     }
     public async Task<IActionResult> Index()
     {
-        var books = await _repository.GetAllAsync(b => b.Price > 12);
+        var books = await _bookRepository.GetAllAsync(b => b.Price > 12);
         return View(books);
     }
 
     public async Task<IActionResult> Details(int id)
     {
-        var book = await _repository.Get(b => b.Id == id);
+        var book = await _bookRepository.Get(b => b.Id == id);
         if (book == null)
         {
             return NotFound();
@@ -35,8 +36,8 @@ public class AdminBookController : Controller
     {
         if (ModelState.IsValid)
         {
-            await _repository.Add(book);
-            await _repository.Save();
+            await _bookRepository.Add(book);
+            await _bookRepository.Save();
             TempData["ToastrMessage"] = "Book created successfully.";
             TempData["ToastrType"] = "success";
             return RedirectToAction(nameof(Index));
@@ -45,7 +46,7 @@ public class AdminBookController : Controller
     }
     public async Task<IActionResult> Edit(int id)
     {
-        var book = await _repository.Get(b => b.Id == id);
+        var book = await _bookRepository.Get(b => b.Id == id);
         if (book == null)
         {
             return NotFound();
@@ -58,8 +59,8 @@ public class AdminBookController : Controller
     {
         if (ModelState.IsValid)
         {
-            _repository.Update(book);
-            await _repository.Save();
+            _bookRepository.Update(book);
+            await _bookRepository.Save();
             TempData["ToastrMessage"] = "Book updated successfully.";
             TempData["ToastrType"] = "success";
             return RedirectToAction(nameof(Index));
@@ -68,7 +69,7 @@ public class AdminBookController : Controller
     }
     public async Task<IActionResult> Delete(int id)
     {
-        var book = await _repository.Get(b => b.Id == id);
+        var book = await _bookRepository.Get(b => b.Id == id);
         if (book == null)
         {
             return NotFound();
@@ -79,13 +80,13 @@ public class AdminBookController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var book = await _repository.Get(b => b.Id == id);
+        var book = await _bookRepository.Get(b => b.Id == id);
         if (book == null)
         {
             return NotFound();
         }
-        _repository.Remove(book);
-        await _repository.Save();
+        _bookRepository.Remove(book);
+        await _bookRepository.Save();
         TempData["ToastrMessage"] = "Book deleted successfully.";
         TempData["ToastrType"] = "success";
         return RedirectToAction(nameof(Index));

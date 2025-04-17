@@ -1,11 +1,13 @@
-﻿using eBookStore.Domain.Entities;
+﻿using eBookStore.Application.Common.Interfaces;
+using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Repositories;
 
-public class CartService
+namespace eBookStore.Infrastructure.Services;
+public class CartService : ICartService
 {
-    private readonly CartRepository _cartRepository;
-    private readonly BookRepository _bookRepository;
-    public CartService(CartRepository cartRepository, BookRepository bookRepository)
+    private readonly ICartRepository _cartRepository;
+    private readonly IBookRepository _bookRepository;
+    public CartService(ICartRepository cartRepository, IBookRepository bookRepository)
     {
         _cartRepository = cartRepository;
         _bookRepository = bookRepository;
@@ -37,7 +39,7 @@ public class CartService
         }
 
         decimal price = await _bookRepository.GetBookPriceAsync(bookId);
-   
+
 
         cart.CartItems.Add(new CartItem
         {
