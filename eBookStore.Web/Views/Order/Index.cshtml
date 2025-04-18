@@ -1,0 +1,88 @@
+﻿@model eBookStore.Web.ViewModels.CheckoutVM
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4">Checkout</h2>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="row">
+        <!-- Shipping Information -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Shipping Information</h5>
+
+                    <form method="post" asp-action="PlaceOrder" id="checkoutForm">
+                        <div class="mb-3">
+                            <label asp-for="ShippingAddress" class="form-label"></label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Order Summary</h5>
+
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Book</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.Book.Title</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Book.Price.ToString("C")</td>
+                                    <td>$@(item.Quantity * item.Book.Price)</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-group-divider">
+                            <tr>
+                                <td colspan="3" class="text-end fw-semibold">Shipping</td>
+                                <td>$00</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Total</td>
+                                <td class="fw-bold">
+                                    @Model.Items.Sum(i => i.Quantity * i.Book.Price).ToString("C")
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="text-end mt-4">
+                        <button type="submit" form="checkoutForm" class="btn btn-success btn-lg px-4">
+                            Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

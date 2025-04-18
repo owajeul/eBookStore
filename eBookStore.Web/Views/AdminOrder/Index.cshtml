@@ -1,0 +1,49 @@
+﻿@model List<Order>
+@{
+    ViewData["Title"] = "My Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h2 class="mb-4">My Orders</h2>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dummy Orders -->
+
+            @foreach(var order in Model)
+            {                
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.OrderDate</td>
+                    <td>@order.TotalPrice</td>
+                    <td>Processing</td>
+                    <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+                </tr>
+            }
+            <tr>
+                <td>#1002</td>
+                <td>2025-04-05</td>
+                <td>$24.50</td>
+                <td>Shipped</td>
+                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+            </tr>
+            <tr>
+                <td>#1003</td>
+                <td>2025-03-28</td>
+                <td>$89.00</td>
+                <td>Delivered</td>
+                <td><a href="#" class="btn btn-sm btn-primary">View</a></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

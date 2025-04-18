@@ -4,13 +4,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using eBookStore.Application.Common.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace eBookStore.Infrastructure.Repositories;
 
-public class Repository<T> : IRepository<T> where T : class
+public class Repository<T> :IRepository<T> where T : class
 {
     private readonly AppDbContext _dbContext;
     internal DbSet<T> _dbSet;
@@ -18,7 +19,7 @@ public class Repository<T> : IRepository<T> where T : class
     public Repository(AppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _dbSet = _dbContext.Set<T>();
+        _dbSet = dbContext.Set<T>();
     }
     public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null)
     {

@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using eBookStore.Application.Services.Implementations;
+using eBookStore.Application.Common.Interfaces;
 using eBookStore.Web.Models;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace eBookStore.Web.Controllers;
 public class HomeController : Controller
 {
-    private readonly BookService _bookService;
-    public HomeController(BookService bookService)
+    private readonly IBookService _bookService;
+    public HomeController(IBookService bookService)
     {
         _bookService = bookService;
     }

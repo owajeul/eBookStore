@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eBookStore.Application.Common.Interfaces;
 using eBookStore.Domain.Entities;
-using eBookStore.Infrastructure.Repositories;
 
-namespace eBookStore.Application.Services.Implementations;
+namespace eBookStore.Infrastructure.Services;
 
-public class BookService
+public class BookService : IBookService
 {
-    private readonly BookRepository _bookRepository;
-    public BookService(BookRepository bookRepository)
+    private readonly IBookRepository _bookRepository;
+    public BookService(IBookRepository bookRepository)
     {
         _bookRepository = bookRepository;
     }
@@ -29,5 +29,10 @@ public class BookService
     {
         var books = await _bookRepository.GetAllAsync();
         return books.Select(b => b.Genre).Distinct().ToList();
+    }
+
+    public async Task<Book> GetBookAsync(int id)
+    {
+        return await _bookRepository.Get(b => b.Id == id);
     }
 }
