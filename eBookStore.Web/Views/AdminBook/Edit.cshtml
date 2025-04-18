@@ -1,65 +1,361 @@
 ﻿@model Book
-
 @{
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Edit Book";
 }
 
-<div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-header bg-success text-center text-white py-2">
-            <h2>Edit Book</h2>
-        </div>
-        <div class="card-body">
-            <form asp-action="Edit">
-                <input type="hidden" asp-for="Id" />
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@section Styles {
+    <style>
+        .book-form-container {
+            max-width: 900px;
+            margin: 2rem auto;
+        }
 
-                <div class="mb-3">
-                    <label asp-for="Title" class="form-label"></label>
-                    <input asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
+        .form-header {
+            background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+            border-radius: 10px 10px 0 0;
+            padding: 1.8rem 0;
+            position: relative;
+            margin-bottom: 0;
+        }
+
+            .form-header h2 {
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                margin-bottom: 0;
+            }
+
+        .form-content {
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-icon {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                border-color: #4caf50;
+                box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+            }
+
+        .form-select {
+            border-radius: 8px;
+            height: calc(2.5rem + 2px);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .price-input-group {
+            position: relative;
+        }
+
+            .price-input-group .form-control {
+                padding-left: 2rem;
+            }
+
+        .currency-symbol {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #495057;
+            z-index: 10;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            }
+
+        .btn-back {
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border: 1px solid #ced4da;
+            color: #495057;
+            background-color: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+            .btn-back:hover {
+                background-color: #e9ecef;
+            }
+
+        .validation-message {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        /* Preview image container */
+        .cover-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            background-color: #f8f9fa;
+            overflow: hidden;
+        }
+
+            .cover-preview img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+
+        .preview-placeholder {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Responsive adjustments */
+        media (max-width: 768px) {
+            .form-section
+
+        {
+            padding: 1rem;
+        }
+
+        .form-content {
+            padding: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+            gap: 1rem;
+        }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+
+        }
+    </style>
+}
+
+<div class="container book-form-container">
+    <div class="form-header text-center text-white">
+        <h2><i class="fas fa-edit me-2"></i>Edit Book</h2>
+    </div>
+
+    <div class="form-content">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3 class="section-title">Basic Information</h3>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Book Title</label>
+                            <input asp-for="Title" class="form-control" placeholder="Enter the title of the book" />
+                            <span asp-validation-for="Title" class="text-danger validation-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label asp-for="Genre" class="form-label">Genre</label>
+                            <select asp-for="Genre" class="form-select">
+                                <option selected disabled>Select genre</option>
+                                <option value="Fiction">Fiction</option>
+                                <option value="Non-Fiction">Non-Fiction</option>
+                                <option value="Science Fiction">Science Fiction</option>
+                                <option value="Fantasy">Fantasy</option>
+                                <option value="Mystery/Thriller">Mystery/Thriller</option>
+                                <option value="Romance">Romance</option>
+                                <option value="Biography">Biography</option>
+                                <option value="History">History</option>
+                                <option value="Self-Help">Self-Help</option>
+                                <option value="Children">Children</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Genre" class="text-danger validation-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label asp-for="Author" class="form-label">Author</label>
+                            <input asp-for="Author" class="form-control" placeholder="Enter author's full name" />
+                            <span asp-validation-for="Author" class="text-danger validation-message"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-align-left"></i>
+                    </div>
+                    <h3 class="section-title">Book Description</h3>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Author" class="form-label"></label>
-                    <input asp-for="Author" class="form-control" />
-                    <span asp-validation-for="Author" class="text-danger"></span>
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" placeholder="Enter a detailed description of the book..."></textarea>
+                    <div class="form-text">Provide a compelling summary that will engage potential readers.</div>
+                    <span asp-validation-for="Description" class="text-danger validation-message"></span>
+                </div>
+            </div>
+
+            <!-- Pricing & Inventory Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="section-title">Pricing & Inventory</h3>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label">Price</label>
+                            <div class="price-input-group">
+                                <span class="currency-symbol">$</span>
+                                <input asp-for="Price" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger validation-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Stock" class="form-label">Stock Quantity</label>
+                            <input asp-for="Stock" class="form-control" type="number" min="0" placeholder="Available quantity" />
+                            <span asp-validation-for="Stock" class="text-danger validation-message"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Image Section -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3 class="section-title">Book Cover</h3>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Genre" class="form-label"></label>
-                    <input asp-for="Genre" class="form-control" />
-                    <span asp-validation-for="Genre" class="text-danger"></span>
+                    <label asp-for="ImageUrl" class="form-label">Cover Image URL</label>
+                    <input asp-for="ImageUrl" id="ImageUrl" class="form-control" placeholder="https://example.com/book-cover.jpg" />
+                    <div class="form-text">Enter a direct link to the book cover image.</div>
+                    <span asp-validation-for="ImageUrl" class="text-danger validation-message"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label"></label>
-                    <textarea asp-for="Description" class="form-control"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
+                <div class="cover-preview" id="coverPreview">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="Current Book Cover" />
+                    }
+                    else
+                    {
+                        <div class="preview-placeholder">
+                            <i class="fas fa-image fa-3x mb-2"></i>
+                            <p>No image currently set</p>
+                        </div>
+                    }
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label asp-for="Price" class="form-label"></label>
-                    <input asp-for="Price" class="form-control" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Back to List
+                </a>
+                <div>
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-eye me-2"></i>View Details
+                    </a>
+                    <button type="submit" class="btn btn-submit text-white">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
                 </div>
-
-                <div class="mb-3">
-                    <label asp-for="ImageUrl" class="form-label"></label>
-                    <input asp-for="ImageUrl" class="form-control" />
-                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Stock" class="form-label"></label>
-                    <input asp-for="Stock" class="form-control" />
-                    <span asp-validation-for="Stock" class="text-danger"></span>
-                </div>
-
-                <button type="submit" class="btn btn-success px-4">Save</button>
-                <a asp-action="Index" class="btn btn-secondary px-4">Back</a>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -67,4 +363,37 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function() {
+            // Image preview functionality
+            $("#ImageUrl").on("change keyup paste", function() {
+                const imageUrl = $(this).val();
+                const previewContainer = $("#coverPreview");
+
+                if (imageUrl) {
+                    // Check if image exists and load it
+                    const img = new Image();
+                    img.onload = function() {
+                        previewContainer.html('<img src="' + imageUrl + '" alt="Book Cover Preview" />');
+                    };
+                    img.onerror = function() {
+                        previewContainer.html(`
+                            <div class="preview-placeholder">
+                                <i class="fas fa-exclamation-circle fa-3x mb-2 text-warning"></i>
+                                <p>Unable to load image. Please check the URL.</p>
+                            </div>
+                        `);
+                    };
+                    img.src = imageUrl;
+                } else {
+                    previewContainer.html(`
+                        <div class="preview-placeholder">
+                            <i class="fas fa-image fa-3x mb-2"></i>
+                            <p>No image will be displayed</p>
+                        </div>
+                    `);
+                }
+            });
+        });
+    </script>
 }
