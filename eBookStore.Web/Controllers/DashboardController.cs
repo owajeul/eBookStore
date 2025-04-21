@@ -24,5 +24,12 @@ namespace eBookStore.Web.Controllers
             var dashBoardViewModel = _mapper.Map<AdminDashboardVM>(dashboardData);
             return View(dashBoardViewModel);
         }
+
+        public async Task<IActionResult> LowStockBook()
+        {
+            var lowStockBooks = await _adminService.GetLowStockBooksAsync();
+            var lowStockBooksViewModel = _mapper.Map<List<BookVM>>(lowStockBooks);
+            return View(lowStockBooksViewModel);
+        }
     }
 }

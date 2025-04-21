@@ -41,7 +41,7 @@ namespace eBookStore.Application.Services
 
             var lowStockBooksRaw = await _adminRepository.GetLowStockBooksAsync(LOW_STOCK_THRESHOLD);
 
-            var lowStockBooks = _mapper.Map<List<BookDto>>(lowStockBooksRaw);
+            var lowStockBooks = _mapper.Map<List<BookDto>>(lowStockBooksRaw.Take(10));
 
             return new AdminDashboardDto
             {
@@ -52,6 +52,12 @@ namespace eBookStore.Application.Services
                 TopSellingBooks = topSellingBooks,
                 LowStockBooks = lowStockBooks
             };
+        }
+
+        public async Task<List<BookDto>> GetLowStockBooksAsync()
+        {
+            var lowStockBooks = await _adminRepository.GetLowStockBooksAsync(LOW_STOCK_THRESHOLD);
+            return _mapper.Map<List<BookDto>>(lowStockBooks);
         }
 
     }

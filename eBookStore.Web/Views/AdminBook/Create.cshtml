@@ -352,13 +352,11 @@
     }
     <script>
         $(document).ready(function() {
-            // Image preview functionality
             $("#ImageUrl").on("change keyup paste", function() {
                 const imageUrl = $(this).val();
                 const previewContainer = $("#coverPreview");
 
                 if (imageUrl) {
-                    // Check if image exists and load it
                     const img = new Image();
                     img.onload = function() {
                         previewContainer.html('<img src="' + imageUrl + '" alt="Book Cover Preview" />');

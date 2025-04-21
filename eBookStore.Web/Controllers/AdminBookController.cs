@@ -92,4 +92,29 @@ public class AdminBookController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> RestockBook(int id, int quantityToAdd)
+    {
+        if (quantityToAdd <= 0)
+        {
+            TempData["ToastrMessage"] = "Invalid quantity!";
+            TempData["ToastrType"] = "error";
+            return RedirectToAction("Index", "Dashboard");
+        }
+        var book = await _bookRepository.Get(b => b.Id == id);
+
+        if (book == null)
+        {
+            return NotFound();
+        }
+        book.Stock += quantityToAdd;
+        _bookRepository.Update(book);
+        await _bookRepository.Save();
+
+        TempData["ToastrMessage"] = "Book restocked successfully.";
+        TempData["ToastrType"] = "success";
+
+        return RedirectToAction("Index", "Dashboard");
+    }
+
 }
