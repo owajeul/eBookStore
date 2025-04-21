@@ -1,0 +1,616 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Process Order";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .page-container {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #3498db, #6c5ce7);
+            border-radius: 3px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            height: calc(100% - 10px);
+            width: 2px;
+            background-color: #e0e0e0;
+        }
+        
+        .timeline-step {
+            position: relative;
+            padding-bottom: 25px;
+        }
+        
+        .timeline-step:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-step:before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            z-index: 1;
+        }
+        
+        .timeline-step.active:before {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        
+        .timeline-step.completed:before {
+            background-color: #2ecc71;
+            border-color: #2ecc71;
+        }
+        
+        .timeline-content {
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        
+        .timeline-step.active .timeline-content {
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .timeline-step.completed .timeline-content {
+            color: #2ecc71;
+        }
+        
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+        
+        .order-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .order-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-processing {
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+        
+        .status-shipped {
+            background-color: rgba(230, 126, 34, 0.15);
+            color: #e67e22;
+        }
+        
+        .status-delivered {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+        
+        .status-cancelled {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+        
+        .btn-update {
+            background: linear-gradient(135deg, #3498db, #6c5ce7);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+            color: white;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #2980b9, #5d50d2);
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+        }
+        
+        .product-img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .product-table td {
+            vertical-align: middle;
+        }
+        
+        .status-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .tracking-input {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .breadcrumb-item a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: #7f8c8d;
+        }
+        
+        .notification-block {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .notification-customer {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid #3498db;
+        }
+        
+        .customer-info-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .customer-info-label {
+            color: #7f8c8d;
+        }
+        
+        .activity-badge {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+        
+        .activity-badge-info {
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+        
+        .activity-badge-success {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+        
+        .activity-badge-warning {
+            background-color: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+        }
+        
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        media (max-width: 768px) {
+            .order-actions {
+                margin-top: 15px;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .order-actions .btn {
+                flex: 1;
+                margin-right: 10px;
+            }
+            
+            .order-actions .btn:last-child {
+                margin-right: 0;
+            }
+        }
+    </style>
+}
+
+<div class="container py-4">
+    <div class="page-container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/Admin/Orders">Orders</a></li>
+                <li class="breadcrumb-item active">Order #@Model.Id</li>
+            </ol>
+        </nav>
+        
+        <!-- Page Header with Back Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="page-title mb-0">
+                <i class="bi bi-box-seam me-2"></i>Order #@Model.Id
+            </h2>
+            <div class="order-actions">
+                <a href="/Admin/Orders" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Orders
+                </a>
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots me-1"></i>More Actions
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-printer me-2"></i>Print Invoice</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-envelope me-2"></i>Email Customer</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-x-circle me-2"></i>Cancel Order</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Customer Notification Block -->
+        <div class="notification-block notification-customer mb-4">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-info-circle me-2"></i>
+                <span>Any status updates will automatically notify the customer via email.</span>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Left Column: Order Details -->
+            <div class="col-lg-8">
+                <!-- Status Update Card -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Update Order Status</span>
+                        <span class="status-badge @(Model.Status == "Processing" ? "status-processing" : Model.Status == "Shipped" ? "status-shipped" : "status-delivered")">
+                            @Model.Status
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Update" method="post">
+                            <input type="hidden" name="orderId" value="@Model.Id" />
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="orderStatus" class="form-label">New Status</label>
+                                    <select id="orderStatus" name="orderStatus" class="form-select status-select">
+                                        @foreach(var staus in AppConstant.ValidStatuses)
+                                        {
+                                            <option value="@staus">@staus</option>
+                                        })
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 shipped-options">
+                                    <label for="trackingNumber" class="form-label">Tracking Number</label>
+                                    <input type="text" class="form-control tracking-input" id="trackingNumber" name="TrackingNumber" placeholder="Enter tracking number">
+                                </div>
+                                
+                                <div class="col-12 text-end mt-4">
+                                    <button type="submit" class="btn btn-update">
+                                        <i class="bi bi-check2-circle me-2"></i>Update Status
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Order Items Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-book me-2"></i>Order Items (@Model.OrderItems.Count)
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table product-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.OrderItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@item.Book.ImageUrl" alt="Book cover" class="product-img me-3">
+                                                    <div>
+                                                        <p class="mb-1 fw-medium">@item.Book.Title</p>
+                                                     
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@item.Book.Price.ToString("C")</td>
+                                            <td>@item.Quantity</td>
+                                            <td class="fw-medium">@((item.Quantity * item.Book.Price).ToString("C"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-group-divider">
+                                    <tr>
+                                        <td colspan="3" class="text-end">Subtotal</td>
+                                        <td class="fw-medium">@Model.TotalPrice.ToString("C")</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end">Shipping</td>
+                                        <td>$5</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Total</td>
+                                        <td class="fw-bold">@Model.TotalPrice.ToString("C")</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity History Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-clock-history me-2"></i>Activity History
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-log">
+                            <div class="activity-item">
+                                <div class="d-flex">
+                                    <span class="activity-badge activity-badge-success">
+                                        <i class="bi bi-check"></i>
+                                    </span>
+                                    <div>
+                                        <p class="mb-1">Order created</p>
+                                        <small class="text-muted">@Model.OrderDate.ToString("MMM dd, yyyy - hh:mm tt")</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="d-flex">
+                                    <span class="activity-badge activity-badge-info">
+                                        <i class="bi bi-credit-card"></i>
+                                    </span>
+                                    <div>
+                                        <p class="mb-1">Payment confirmed</p>
+                                        <small class="text-muted">@Model.OrderDate.AddMinutes(2).ToString("MMM dd, yyyy - hh:mm tt")</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="d-flex">
+                                    <span class="activity-badge activity-badge-warning">
+                                        <i class="bi bi-gear"></i>
+                                    </span>
+                                    <div>
+                                        <p class="mb-1">Status updated to Processing</p>
+                                        <small class="text-muted">@Model.OrderDate.AddHours(1).ToString("MMM dd, yyyy - hh:mm tt")</small>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.Status == "Shipped" || Model.Status == "Delivered")
+                            {
+                                <div class="activity-item">
+                                    <div class="d-flex">
+                                        <span class="activity-badge activity-badge-warning">
+                                            <i class="bi bi-truck"></i>
+                                        </span>
+                                        <div>
+                                            <p class="mb-1">Status updated to Shipped</p>
+                                            <small class="text-muted">@Model.OrderDate.AddDays(1).ToString("MMM dd, yyyy - hh:mm tt")</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (Model.Status == "Delivered")
+                            {
+                                <div class="activity-item">
+                                    <div class="d-flex">
+                                        <span class="activity-badge activity-badge-success">
+                                            <i class="bi bi-check-circle"></i>
+                                        </span>
+                                        <div>
+                                            <p class="mb-1">Status updated to Delivered</p>
+                                            <small class="text-muted">@Model.OrderDate.AddDays(3).ToString("MMM dd, yyyy - hh:mm tt")</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Customer Details & Status Timeline -->
+            <div class="col-lg-4">
+                <!-- Customer Details Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-person me-2"></i>Customer Information
+                    </div>
+                    <div class="card-body">
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Name</span>
+                            <span class="customer-info-value">John Doe</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Email</span>
+                            <span class="customer-info-value">john.doe@example.com</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Phone</span>
+                            <span class="customer-info-value">@Model.PhoneNumber</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Customer Since</span>
+                            <span class="customer-info-value">Jan 15, 2025</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Total Orders</span>
+                            <span class="customer-info-value">5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shipping Information Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-geo-alt me-2"></i>Shipping Information
+                    </div>
+                    <div class="card-body">
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Address</span>
+                            <span class="customer-info-value">@Model.ShippingAddress</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Method</span>
+                            <span class="customer-info-value">Standard Shipping</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Est. Delivery</span>
+                            <span class="customer-info-value">@Model.OrderDate.AddDays(5).ToString("MMM dd, yyyy")</span>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Order Status Timeline Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-graph-up me-2"></i>Status Timeline
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-step completed">
+                                <div class="timeline-content">Order Placed</div>
+                                <div class="timeline-date">@Model.OrderDate.ToString("MMM dd, yyyy")</div>
+                            </div>
+                            <div class="timeline-step completed">
+                                <div class="timeline-content">Processing</div>
+                                <div class="timeline-date">@Model.OrderDate.AddHours(1).ToString("MMM dd, yyyy")</div>
+                            </div>
+                            <div class="timeline-step @(Model.Status == "Shipped" || Model.Status == "Delivered" ? "completed" : "active")">
+                                <div class="timeline-content">Shipped</div>
+                                <div class="timeline-date">@(Model.Status == "Shipped" || Model.Status == "Delivered" ? Model.OrderDate.AddDays(1).ToString("MMM dd, yyyy") : "-")</div>
+                            </div>
+                            <div class="timeline-step @(Model.Status == "Delivered" ? "completed" : "")">
+                                <div class="timeline-content">Delivered</div>
+                                <div class="timeline-date">@(Model.Status == "Delivered" ? Model.OrderDate.AddDays(3).ToString("MMM dd, yyyy") : "-")</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show/hide shipping options based on selected status
+            const statusSelect = document.getElementById('orderStatus');
+            const shippedOptions = document.querySelector('.shipped-options');
+            
+            function toggleShippingOptions() {
+                if (statusSelect.value === 'Shipped') {
+                    shippedOptions.classList.remove('d-none');
+                } else {
+                    shippedOptions.classList.add('d-none');
+                }
+            }
+            
+            // Initial setup
+            toggleShippingOptions();
+            
+            // Listen for changes
+            statusSelect.addEventListener('change', toggleShippingOptions);
+            
+            // Confirmation before cancellation
+            document.querySelectorAll('.text-danger').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+}
