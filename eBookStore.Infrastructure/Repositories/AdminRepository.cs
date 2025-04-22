@@ -81,12 +81,17 @@ namespace eBookStore.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Book>> GetLowStockBooksAsync(int threshold)
+        public async Task<List<Book>> GetLowStockBooksAsync(int threshold, int? maxResults = null)
         {
-            return await _dbContext.Books
+            var query = _dbContext.Books
                 .Where(b => b.Stock <= threshold)
-                .OrderBy(b => b.Stock)
-                .ToListAsync();
+                .OrderBy(b => b.Stock);
+
+            if (maxResults.HasValue)
+            {
+                query.Take(maxResults.Value);
+            }
+            return await query.ToListAsync();
         }
     }
 }

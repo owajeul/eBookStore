@@ -62,43 +62,14 @@
 }
 
 <!-- Top Selling Books -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold"><i class="bi bi-graph-up me-2"></i>Top Selling Books</h6>
-                <a href="/Admin/Reports" class="btn btn-sm btn-primary">
-                    <i class="bi bi-file-earmark-bar-graph me-1"></i> View Reports
-                </a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Category</th>
-                                <th>Copies Sold</th>
-                                <th>Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-							@foreach (var book in Model.TopSellingBooks)
-							{
-								<tr>
-									<td>@book.Title</td>
-									<td>@book.Author</td>
-									<td><span class="badge bg-primary">@book.Genre</span></td>
-									<td>@book.CopiesSold</td>
-									<td>@book.Revenue.ToString("C")</td>
-								</tr>
-							}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@if (Model.TopSellingBooks.Count > 0)
+{
+	<div class="d-flex justify-content-end mb-2">
+		<a asp-action="TopSellingBook" asp-controller="Dashboard"
+		   class="btn btn-sm btn-primary">
+			<i class="bi bi-eye me-1"></i> View All
+		</a>
+	</div>
+	@await Component.InvokeAsync("TopSellingBooks", Model.TopSellingBooks)
+}
 

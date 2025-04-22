@@ -12,7 +12,8 @@ namespace eBookStore.Web.Controllers
     {
         private readonly IAdminService _adminService;
         private readonly IMapper _mapper;
-
+        private const int LOW_STOCK_THRESHOLD = 5;
+        private const int TOP_SELLING_BOOKS_COUNT = 100;
         public DashboardController(IAdminService adminService, IMapper mapper)
         {
             _adminService = adminService;
@@ -27,9 +28,16 @@ namespace eBookStore.Web.Controllers
 
         public async Task<IActionResult> LowStockBook()
         {
-            var lowStockBooks = await _adminService.GetLowStockBooksAsync();
+            var lowStockBooks = await _adminService.GetLowStockBooksAsync(LOW_STOCK_THRESHOLD);
             var lowStockBooksViewModel = _mapper.Map<List<BookVM>>(lowStockBooks);
             return View(lowStockBooksViewModel);
+        }
+
+        public async Task<IActionResult> TopSellingBook()
+        {
+            var topSellingBooks = await _adminService.GetTopSellingBooksAsync(TOP_SELLING_BOOKS_COUNT);
+            var topSellingBooksViewModel = _mapper.Map<List<TopSellingBookVM>>(topSellingBooks);
+            return View(topSellingBooksViewModel);
         }
     }
 }
