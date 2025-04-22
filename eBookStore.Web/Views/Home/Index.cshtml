@@ -1,4 +1,4 @@
-﻿@model HomeVM
+﻿
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -23,26 +23,7 @@
                                 <div class="filter-title">
                                     <i class="bi bi-bookmark-fill"></i>Genre
                                 </div>
-                                <select class="form-select" name="genre" id="genre" onchange="this.form.submit()">
-                                    @if (string.IsNullOrEmpty(Model.SelectedGenre))
-                                    {
-                                        <option value="" selected>All Genres</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="">All Genres</option>
-                                    }
-                                    @foreach (var genre in Model.BookGenres)
-                                    {
-                                        if (genre == Model.SelectedGenre)
-                                        {
-                                            <option value="@genre" selected>@genre</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@genre">@genre</option>
-                                        }
-                                    }
+                                <select class="form-select" name="genre" id="genre">
                                 </select>
                             </div>
 
@@ -65,21 +46,21 @@
                                     <i class="bi bi-sort-down"></i>Sort By
                                 </div>
                                 <div class="form-check mb-2">
-                                    <input class="form-check-input" type="radio" name="sortBy" id="sortAsc" value="asc" checked>
+                                    <input class="form-check-input" type="radio" name="sortBy" id="sortAsc" value="@AppConstant.SortByPriceAsc" checked>
                                     <label class="form-check-label" for="sortAsc">
                                         <i class="bi bi-arrow-up me-1"></i>Price: Low to High
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="sortBy" id="sortDesc" value="desc">
+                                    <input class="form-check-input" type="radio" name="sortBy" id="sortDesc" value="@AppConstant.SortByPriceDesc">
                                     <label class="form-check-label" for="sortDesc">
                                         <i class="bi bi-arrow-down me-1"></i>Price: High to Low
                                     </label>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-apply w-100">
-                                <i class="bi bi-search me-2"></i>Apply Filters
+                            <button class="btn btn-outline-secondary w-100" id="resetFilter" style="box-shadow:none !important;">
+                                Clear Filters
                             </button>
                         </form>
                     </div>
@@ -93,18 +74,68 @@
                 <h2 class="section-title">Featured Books</h2>
             </div>
 
-            <div class="row g-4">
-                @foreach (var book in Model.Books)
-                {
+            <div class="row g-4" id="bookList">
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const $bookList = $('#bookList');
+            const $genreSelect = $('#genre');
+            const $priceRange = $('#priceRange');
+            const $priceValue = $('#priceValue');
+            const $filterForm = $('#filterForm');
+            const $resetFilterBtn = $('#resetFilter');
+
+            $priceRange.on('input', function () {
+                $priceValue.text('$' + $(this).val());
+            });
+
+            function loadBooks() {
+                const filter = {
+                    genre: $genreSelect.val(),
+                    maxPrice: $priceRange.val(),
+                    sortBy: $('input[name="sortBy"]:checked').val()
+                };
+				console.log(filter);
+                $.ajax({
+                    url: '/Home/GetHomePageData',
+                    method: 'GET',
+                    data: filter,
+                    success: function (response) {
+                        console.log(response);
+                        renderBooks(response.books);
+                        renderGenres(response.bookGenres, response.selectedGenre);
+                    },
+                    error: function () {
+                        $bookList.html('<div class="col-12">Failed to load books.</div>');
+                    }
+                });
+            }
+
+            function renderBooks(books) {
+                $bookList.empty();
+
+                if (!books.length) {
+                    $bookList.append('<div class="col-12">No books found.</div>');
+                    return;
+                }
+
+                $.each(books, function (i, book) {
+                    const bookCard = `
                     <div class="col-md-6 col-lg-4">
                         <div class="book-card">
                             <div class="book-img-container">
-                                <img src="@book.ImageUrl" class="book-img" alt="@book.Title">
-                                <div class="genre-badge">@book.Genre</div>
+                                <img src="${book.imageUrl}" class="book-img" alt="${book.title}">
+                                <div class="genre-badge">${book.genre}</div>
                             </div>
                             <div class="book-details">
-                                <h3 class="book-title">@book.Title</h3>
-                                <p class="book-author">by @book.Author</p>
+                                <h3 class="book-title">${book.title}</h3>
+                                <p class="book-author">by ${book.author}</p>
                                 <div class="rating">
                                     <div class="stars">
                                         <i class="bi bi-star-fill"></i>
@@ -116,30 +147,41 @@
                                     <span class="rating-count">(4.5/5)</span>
                                 </div>
                                 <div class="book-action">
-                                    <h4 class="book-price">$@book.Price.ToString("0.00")</h4>
-                                    <a asp-action="Details" asp-controller="Book" asp-route-id="@book.Id" class="btn btn-details">
+                                    <h4 class="book-price">$${book.price.toFixed(2)}</h4>
+                                    <a href="/Book/Details/${book.id}" class="btn btn-details">
                                         <i class="bi bi-eye me-1"></i>Details
                                     </a>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-	<script>
-        $(document).ready(function () {
-            const $priceRange = $('#priceRange');
-            const $priceValue = $('#priceValue');
-            if ($priceRange.length && $priceValue.length) {
-                $priceRange.on('input', function () {
-                    $priceValue.text('$' + $(this).val());
+                    </div>`;
+                    $bookList.append(bookCard);
                 });
             }
+
+            function renderGenres(genres, selectedGenre) {
+                $genreSelect.empty();
+                $genreSelect.append(`<option value="">All Genres</option>`);
+
+                $.each(genres, function (i, genre) {
+                    const selected = genre === selectedGenre ? 'selected' : '';
+                    $genreSelect.append(`<option value="${genre}" ${selected}>${genre}</option>`);
+                });
+            }
+            $resetFilterBtn.on('click', function(e) {
+                e.preventDefault();
+                $genreSelect.val('');
+                $priceRange.val('100');
+                $priceValue.val('$50');
+
+                loadBooks();
+            });
+
+            $filterForm.on('change', 'select, input', function (e) {
+                loadBooks();
+            });
+
+            loadBooks();
         });
     </script>
 }

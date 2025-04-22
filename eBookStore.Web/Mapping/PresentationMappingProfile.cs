@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eBookStore.Application.Common.Dto;
+using eBookStore.Web.Models;
 using eBookStore.Web.ViewModels;
 
 namespace eBookStore.Web.Mapping
@@ -11,6 +12,7 @@ namespace eBookStore.Web.Mapping
             CreateMap<AdminDashboardDto, AdminDashboardVM>();
             CreateMap<TopSellingBookDto, TopSellingBookVM>();
             CreateMap<BookDto, BookVM>();
+            CreateMap<BookFilterModel, BookFilterDto>();
         }
     }
 }

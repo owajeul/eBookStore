@@ -16,6 +16,9 @@ namespace eBookStore.Application.Common.Utilily
         public const string StatusDelivered = "Delivered";
         public const string StatusCancelled = "Cancelled";
 
+        public const string SortByPriceAsc = "PriceAsc";
+        public const string SortByPriceDesc = "PriceDesc";
+
         public static List<string> ValidStatuses = new List<string>
         {
             StatusPending,
