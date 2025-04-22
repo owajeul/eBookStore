@@ -67,30 +67,6 @@ public class AdminBookController : Controller
         }
         return View(book);
     }
-    public async Task<IActionResult> Delete(int id)
-    {
-        var book = await _bookRepository.Get(b => b.Id == id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-        return View(book);
-    }
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var book = await _bookRepository.Get(b => b.Id == id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-        _bookRepository.Remove(book);
-        await _bookRepository.Save();
-        TempData["ToastrMessage"] = "Book deleted successfully.";
-        TempData["ToastrType"] = "success";
-        return RedirectToAction(nameof(Index));
-    }
 
     [HttpPost]
     public async Task<IActionResult> RestockBook(int id, int quantityToAdd)
