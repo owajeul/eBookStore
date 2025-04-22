@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using eBookStore.Application.Common.Interfaces;
+using eBookStore.Domain.Entities;
 using eBookStore.Web.Models;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -34,4 +35,5 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
 }

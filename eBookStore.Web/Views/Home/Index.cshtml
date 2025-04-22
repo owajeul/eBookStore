@@ -2,59 +2,144 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Featured Books</h2>
-    <form method="get" class="mb-3 row justify-content-start">
 
-        <div class="col-auto">
-            <select class="form-select ms-4" name="genre" onchange="this.form.submit()" id="genre">
-                @if(string.IsNullOrEmpty(Model.SelectedGenre)) 
-                {
-                    <option value="" selected>All</option>
-                }
-                else
-                {
-                    <option value="">All</option>
-                }
+<div class="container content-wrapper">
+    <div class="row">
+        <!-- Filter Column -->
+        <div class="col-lg-3 mb-4">
+            <button class="btn w-100 filter-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                <i class="bi bi-funnel-fill me-2"></i>
+            </button>
 
-                @foreach (var category in Model.BookGenres)
-                {
-                    if(category == Model.SelectedGenre)
-                    {
-                        <option value="@category" selected>
-                            @category
-                        </option>
-                    }
-                    else
-                    {
-                        <option value="@category">
-                            @category
-                        </option>
-                    }
-                }
-            </select>
-        </div>
-    </form>
-
-
-    <div class="row justify-content-center">
-
-        @foreach(var book in Model.Books)
-        {
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 mb-4 p-2 m-2 rounded-3" style="border:1px solid lightgray;">
-                <div class="card h-100 shadow-sm border-0 rounded-4">
-                    <img src="@book.ImageUrl" class="card-img-top rounded-top-4" style="height: 250px; object-fit: cover;" alt="@book.Title" />
-                    <div class="card-body text-center">
-                        <h5 class="card-title text-primary fw-bold">@book.Title</h5>
-                        <p class="text-muted mb-1">@book.Author</p>
-                        <div class="text-warning">★★★★☆</div>
-                        <h6 class="text-success fw-semibold">$@book.Price</h6>
+            <div class="filter-section-collapse" id="filterCollapse">
+                <div class="filter-card">
+                    <div class="filter-header">
+                        <i class="bi bi-sliders"></i>Filter
                     </div>
-                    <div class="card-footer bg-transparent border-0 p-0">
-                        <a asp-action="Details" asp-controller="Book" asp-route-id="@book.Id" class="btn btn-success rounded-0 rounded-bottom-4 w-100">Details</a>
+                    <div class="filter-body">
+                        <form method="get" id="filterForm">
+                            <!-- Genre Filter -->
+                            <div class="filter-section">
+                                <div class="filter-title">
+                                    <i class="bi bi-bookmark-fill"></i>Genre
+                                </div>
+                                <select class="form-select" name="genre" id="genre" onchange="this.form.submit()">
+                                    @if (string.IsNullOrEmpty(Model.SelectedGenre))
+                                    {
+                                        <option value="" selected>All Genres</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="">All Genres</option>
+                                    }
+                                    @foreach (var genre in Model.BookGenres)
+                                    {
+                                        if (genre == Model.SelectedGenre)
+                                        {
+                                            <option value="@genre" selected>@genre</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@genre">@genre</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Price Range Filter -->
+                            <div class="filter-section">
+                                <div class="filter-title">
+                                    <i class="bi bi-currency-dollar"></i>Price Range
+                                </div>
+                                <input type="range" class="form-range" min="1" max="100" step="5" id="priceRange" name="maxPrice" value="50">
+                                <div class="price-display">
+                                    <span>$0</span>
+                                    <span id="priceValue">$50</span>
+                                    <span>$100</span>
+                                </div>
+                            </div>
+
+                            <!-- Sort By Filter -->
+                            <div class="filter-section">
+                                <div class="filter-title">
+                                    <i class="bi bi-sort-down"></i>Sort By
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="sortBy" id="sortAsc" value="asc" checked>
+                                    <label class="form-check-label" for="sortAsc">
+                                        <i class="bi bi-arrow-up me-1"></i>Price: Low to High
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="sortBy" id="sortDesc" value="desc">
+                                    <label class="form-check-label" for="sortDesc">
+                                        <i class="bi bi-arrow-down me-1"></i>Price: High to Low
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-apply w-100">
+                                <i class="bi bi-search me-2"></i>Apply Filters
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
-        }
+        </div>
+
+        <!-- Books Column -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title">Featured Books</h2>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var book in Model.Books)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="book-card">
+                            <div class="book-img-container">
+                                <img src="@book.ImageUrl" class="book-img" alt="@book.Title">
+                                <div class="genre-badge">@book.Genre</div>
+                            </div>
+                            <div class="book-details">
+                                <h3 class="book-title">@book.Title</h3>
+                                <p class="book-author">by @book.Author</p>
+                                <div class="rating">
+                                    <div class="stars">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-half"></i>
+                                    </div>
+                                    <span class="rating-count">(4.5/5)</span>
+                                </div>
+                                <div class="book-action">
+                                    <h4 class="book-price">$@book.Price.ToString("0.00")</h4>
+                                    <a asp-action="Details" asp-controller="Book" asp-route-id="@book.Id" class="btn btn-details">
+                                        <i class="bi bi-eye me-1"></i>Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+	<script>
+        $(document).ready(function () {
+            const $priceRange = $('#priceRange');
+            const $priceValue = $('#priceValue');
+            if ($priceRange.length && $priceValue.length) {
+                $priceRange.on('input', function () {
+                    $priceValue.text('$' + $(this).val());
+                });
+            }
+        });
+    </script>
+}
