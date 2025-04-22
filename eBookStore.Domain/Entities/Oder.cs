@@ -14,6 +14,7 @@ namespace eBookStore.Domain.Entities
         public string PhoneNumber { get; set; }
         public decimal TotalPrice { get; set; }
         public string UserId { get; set; }
+        public string Status { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; }
     }
 }

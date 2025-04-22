@@ -1,55 +1,307 @@
 ﻿@model Book
-
 @{
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Book Details";
 }
 
-<div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-info text-white text-center fs-4">
-            Book Details
-        </div>
-        <div class="card-body">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="text-center mb-4">
-                        <img src="@Model.ImageUrl" alt="Book Cover" class="img-fluid rounded" style="max-height: 300px;" />
-                    </div>
+@section Styles {
+    <style>
+        .book-details-container {
+            max-width: 900px;
+            margin: 2rem auto;
+        }
 
-                    <div class="row mb-2">
-                        <div class="col-sm-4 fw-semibold">Title:</div>
-                        <div class="col-sm-8">@Model.Title</div>
+        .details-header {
+            background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%);
+            border-radius: 10px 10px 0 0;
+            padding: 1.8rem 0;
+            position: relative;
+            margin-bottom: 0;
+        }
+
+            .details-header h2 {
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                margin-bottom: 0;
+            }
+
+        .details-content {
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .book-image-container {
+            height: 100%;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            border-right: 1px solid #eaeaea;
+        }
+
+        .book-image {
+            max-height: 400px;
+            max-width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+
+            .book-image:hover {
+                transform: scale(1.03);
+            }
+
+        .book-details {
+            padding: 2rem;
+        }
+
+        .book-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+        }
+
+        .book-author {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 1.5rem;
+        }
+
+        .book-metadata {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metadata-item {
+            display: flex;
+            margin-bottom: 0.8rem;
+            align-items: baseline;
+        }
+
+            .metadata-item:last-child {
+                margin-bottom: 0;
+            }
+
+        .metadata-label {
+            font-weight: 600;
+            color: #555;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .metadata-value {
+            flex-grow: 1;
+        }
+
+        .book-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1976d2;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .book-description {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .book-description-title {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 0.8rem;
+        }
+
+        .stock-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-left: 1rem;
+        }
+
+        .in-stock {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .low-stock {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+
+        .out-of-stock {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-edit {
+            background-color: #ff9800;
+            color: white;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            background-color: #f57c00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .btn-back {
+            background-color: #f5f5f5;
+            color: #555;
+            border-radius: 8px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+
+            .btn-back:hover {
+                background-color: #e0e0e0;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+        /* Genre tag styling */
+        .genre-tag {
+            display: inline-block;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive adjustments */
+        media (max-width: 992px) {
+            .book-image-container
+
+        {
+            border-right: none;
+            border-bottom: 1px solid #eaeaea;
+            padding: 1.5rem;
+        }
+
+        .book-image {
+            max-height: 300px;
+        }
+
+        .book-details {
+            padding: 1.5rem;
+        }
+
+        }
+
+        media (max-width: 576px) {
+            .action-buttons
+
+        {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+        }
+
+        .metadata-item {
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+
+        .metadata-label {
+            width: 100%;
+            margin-bottom: 0.2rem;
+        }
+
+        }
+    </style>
+}
+
+<div class="container book-details-container">
+    <div class="details-header text-center text-white">
+        <h2><i class="fas fa-book-open me-2"></i>Book Details</h2>
+    </div>
+
+    <div class="details-content">
+        <div class="row g-0">
+            <!-- Book Image Column -->
+            <div class="col-lg-4 book-image-container">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Title" class="book-image" />
+                }
+                else
+                {
+                    <div class="text-center text-muted">
+                        <i class="fas fa-image fa-5x mb-3"></i>
+                        <p>No image available</p>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 fw-semibold">Author:</div>
-                        <div class="col-sm-8">@Model.Author</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 fw-semibold">Genre:</div>
-                        <div class="col-sm-8">@Model.Genre</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 fw-semibold">Price:</div>
-                        <div class="col-sm-8">@Model.Price.ToString("C")</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 fw-semibold">Stock:</div>
-                        <div class="col-sm-8">@Model.Stock</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-sm-4 fw-semibold">Description:</div>
-                        <div class="col-sm-8">@Model.Description</div>
-                    </div>
-                    <div class="mt-4 text-center">
-                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">Edit</a>
-                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-                    </div>
-                </div>
+                }
             </div>
 
-            <div class="row justify-content-center">
-                <div class="col-md-6">
+            <!-- Book Details Column -->
+            <div class="col-lg-8 book-details">
+                <h1 class="book-title">@Model.Title</h1>
+                <h2 class="book-author">by @Model.Author</h2>
 
+                <div class="genre-tag">
+                    <i class="fas fa-bookmark me-1"></i> @Model.Genre
+                </div>
+
+                <div class="book-price">
+                    @Model.Price.ToString("C")
+                    @{
+                        string stockBadgeClass = Model.Stock > 10 ? "in-stock" : (Model.Stock > 0 ? "low-stock" : "out-of-stock");
+                        string stockText = Model.Stock > 10 ? "In Stock" : (Model.Stock > 0 ? "Low Stock" : "Out of Stock");
+                    }
+                    <span class="stock-badge @stockBadgeClass">
+                        <i class="fas @(Model.Stock > 0 ? "fa-check-circle" : "fa-times-circle") me-1"></i>
+                        @stockText (@Model.Stock)
+                    </span>
+                </div>
+
+                
+
+                <div class="book-description">
+                    <h3 class="book-description-title">Description</h3>
+                    <p>@Model.Description</p>
+                </div>
+
+                <div class="action-buttons">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-edit">
+                        <i class="fas fa-edit me-2"></i>Edit
+                    </a>
+                    <a asp-action="Index" class="btn btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>Back to List
+                    </a>
                 </div>
             </div>
         </div>

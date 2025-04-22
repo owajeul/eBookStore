@@ -13,8 +13,16 @@ namespace eBookStore.Application.Common.Utilily
 
         public const string StatusPending = "Pending";
         public const string StatusApproved = "Approved";
-        public const string StatusCompleted = "Completed";
+        public const string StatusDelivered = "Delivered";
         public const string StatusCancelled = "Cancelled";
+
+        public static List<string> ValidStatuses = new List<string>
+        {
+            StatusPending,
+            StatusApproved,
+            StatusDelivered,
+            StatusCancelled
+        };
     }
 }
 

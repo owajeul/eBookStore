@@ -1,0 +1,23 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User) && User.IsInRole(AppConstant.Role_Admin))
+{
+    <div class="nav-item dropdown">
+        <div class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown">
+            Admin (@User.Identity?.Name)
+        </div>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <li class="nav-item">
+        <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Admin Login</a>
+    </li>
+}

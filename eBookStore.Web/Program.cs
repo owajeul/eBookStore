@@ -2,8 +2,10 @@ using eBookStore.Application.Common.Interfaces;
 using eBookStore.Application.Services;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Data.Identity;
+using eBookStore.Infrastructure.Mapping;
 using eBookStore.Infrastructure.Repositories;
 using eBookStore.Infrastructure.Services;
+using eBookStore.Web.Mapping;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -21,12 +23,19 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
 
 builder.Services.AddScoped<DbInitializer>();
+
+builder.Services.AddAutoMapper( 
+    typeof(PresentationMappingProfile),
+    typeof(InfrastructureMappingProfile)
+);
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

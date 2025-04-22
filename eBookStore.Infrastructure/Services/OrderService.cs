@@ -1,5 +1,6 @@
 ﻿using eBookStore.Application.Common.Dto;
 using eBookStore.Application.Common.Interfaces;
+using eBookStore.Application.Common.Utilily;
 using eBookStore.Domain.Entities;
 
 namespace eBookStore.Application.Services;
@@ -20,6 +21,7 @@ public class OrderService : IOrderService
             UserId = orderDto.UserId,
             ShippingAddress = orderDto.ShippingAddress,
             PhoneNumber = orderDto.PhoneNumber,
+            Status = AppConstant.StatusPending,
             OrderItems = orderDto.OrderItems.Select(ci => new OrderItem
             {
                 BookId = ci.BookId,

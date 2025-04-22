@@ -1,0 +1,434 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Process Order";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .page-container {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #3498db, #6c5ce7);
+            border-radius: 3px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            height: calc(100% - 10px);
+            width: 2px;
+            background-color: #e0e0e0;
+        }
+        
+        .timeline-step {
+            position: relative;
+            padding-bottom: 25px;
+        }
+        
+        .timeline-step:last-child {
+            padding-bottom: 0;
+        }
+        
+        .timeline-step:before {
+            content: '';
+            position: absolute;
+            left: -30px;
+            top: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            z-index: 1;
+        }
+        
+        .timeline-step.active:before {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        
+        .timeline-step.completed:before {
+            background-color: #2ecc71;
+            border-color: #2ecc71;
+        }
+        
+        .timeline-content {
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+        
+        .timeline-step.active .timeline-content {
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .timeline-step.completed .timeline-content {
+            color: #2ecc71;
+        }
+        
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+        
+        .order-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .order-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-processing {
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+        
+        .status-shipped {
+            background-color: rgba(230, 126, 34, 0.15);
+            color: #e67e22;
+        }
+        
+        .status-delivered {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+        
+        .status-cancelled {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+        
+        .btn-update {
+            background: linear-gradient(135deg, #3498db, #6c5ce7);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+            color: white;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s;
+        }
+        
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #2980b9, #5d50d2);
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+        }
+        
+        .product-img {
+            width: 70px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .product-table td {
+            vertical-align: middle;
+        }
+        
+        .status-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .tracking-input {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .breadcrumb-item a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item.active {
+            color: #7f8c8d;
+        }
+        
+        .notification-block {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .notification-customer {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid #3498db;
+        }
+        
+        .customer-info-value {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .customer-info-label {
+            color: #7f8c8d;
+        }
+        
+        .activity-badge {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+        
+        .activity-badge-info {
+            background-color: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+        
+        .activity-badge-success {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+        
+        .activity-badge-warning {
+            background-color: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+        }
+        
+        .activity-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        media (max-width: 768px) {
+            .order-actions {
+                margin-top: 15px;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .order-actions .btn {
+                flex: 1;
+                margin-right: 10px;
+            }
+            
+            .order-actions .btn:last-child {
+                margin-right: 0;
+            }
+        }
+    </style>
+}
+
+<div class="container py-4">
+    <div class="page-container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/Admin/Orders">Orders</a></li>
+                <li class="breadcrumb-item active">Order #@Model.Id</li>
+            </ol>
+        </nav>
+        
+        <!-- Page Header with Back Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="page-title mb-0">
+                <i class="bi bi-box-seam me-2"></i>Order #@Model.Id
+            </h2>
+            <div class="order-actions">
+                <a 
+                    asp-action="Index" asp-controller="AdminOrder"
+                    class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Orders
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Left Column: Order Details -->
+            <div class="col-lg-8">
+                <!-- Status Update Card -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Update Order Status</span>
+                        <span class="status-badge @(Model.Status == "Processing" ? "status-processing" : Model.Status == "Shipped" ? "status-shipped" : "status-delivered")">
+                            @Model.Status
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Update" method="post">
+                            <input type="hidden" name="orderId" value="@Model.Id" />
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="orderStatus" class="form-label">New Status</label>
+                                    <select id="orderStatus" name="orderStatus" class="form-select status-select">
+                                        @foreach(var staus in AppConstant.ValidStatuses)
+                                        {
+                                            <option value="@staus">@staus</option>
+                                        })
+                                    </select>
+                                </div>
+                                
+                                <div class="col-12 text-end mt-4">
+                                    <button type="submit" class="btn btn-update">
+                                        <i class="bi bi-check2-circle me-2"></i>Update Status
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Order Items Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-book me-2"></i>Order Items (@Model.OrderItems.Count)
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table product-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.OrderItems)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="@item.Book.ImageUrl" alt="Book cover" class="product-img me-3">
+                                                    <div>
+                                                        <p class="mb-1 fw-medium">@item.Book.Title</p>
+                                                     
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>@item.Book.Price.ToString("C")</td>
+                                            <td>@item.Quantity</td>
+                                            <td class="fw-medium">@((item.Quantity * item.Book.Price).ToString("C"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-group-divider">
+                                    <tr>
+                                        <td colspan="3" class="text-end">Subtotal</td>
+                                        <td class="fw-medium">@Model.TotalPrice.ToString("C")</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end">Shipping</td>
+                                        <td>$5</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Total</td>
+                                        <td class="fw-bold">@Model.TotalPrice.ToString("C")</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Shipping Information Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-geo-alt me-2"></i>Shipping Information
+                    </div>
+                    <div class="card-body">
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Address</span>
+                            <span class="customer-info-value">@Model.ShippingAddress</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Phone</span>
+                            <span class="customer-info-value">@Model.PhoneNumber</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Method</span>
+                            <span class="customer-info-value">Standard Shipping</span>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
