@@ -307,26 +307,11 @@
                 <i class="bi bi-box-seam me-2"></i>Order #@Model.Id
             </h2>
             <div class="order-actions">
-                <a href="/Admin/Orders" class="btn btn-outline-secondary me-2">
+                <a 
+                    asp-action="Index" asp-controller="AdminOrder"
+                    class="btn btn-outline-secondary me-2">
                     <i class="bi bi-arrow-left me-1"></i>Back to Orders
                 </a>
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-three-dots me-1"></i>More Actions
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="#"><i class="bi bi-printer me-2"></i>Print Invoice</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="bi bi-envelope me-2"></i>Email Customer</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-x-circle me-2"></i>Cancel Order</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Customer Notification Block -->
-        <div class="notification-block notification-customer mb-4">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-info-circle me-2"></i>
-                <span>Any status updates will automatically notify the customer via email.</span>
             </div>
         </div>
         
@@ -354,11 +339,6 @@
                                             <option value="@staus">@staus</option>
                                         })
                                     </select>
-                                </div>
-                                
-                                <div class="col-md-6 shipped-options">
-                                    <label for="trackingNumber" class="form-label">Tracking Number</label>
-                                    <input type="text" class="form-control tracking-input" id="trackingNumber" name="TrackingNumber" placeholder="Enter tracking number">
                                 </div>
                                 
                                 <div class="col-12 text-end mt-4">
@@ -424,111 +404,9 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- Activity History Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-clock-history me-2"></i>Activity History
-                    </div>
-                    <div class="card-body">
-                        <div class="activity-log">
-                            <div class="activity-item">
-                                <div class="d-flex">
-                                    <span class="activity-badge activity-badge-success">
-                                        <i class="bi bi-check"></i>
-                                    </span>
-                                    <div>
-                                        <p class="mb-1">Order created</p>
-                                        <small class="text-muted">@Model.OrderDate.ToString("MMM dd, yyyy - hh:mm tt")</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="d-flex">
-                                    <span class="activity-badge activity-badge-info">
-                                        <i class="bi bi-credit-card"></i>
-                                    </span>
-                                    <div>
-                                        <p class="mb-1">Payment confirmed</p>
-                                        <small class="text-muted">@Model.OrderDate.AddMinutes(2).ToString("MMM dd, yyyy - hh:mm tt")</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="d-flex">
-                                    <span class="activity-badge activity-badge-warning">
-                                        <i class="bi bi-gear"></i>
-                                    </span>
-                                    <div>
-                                        <p class="mb-1">Status updated to Processing</p>
-                                        <small class="text-muted">@Model.OrderDate.AddHours(1).ToString("MMM dd, yyyy - hh:mm tt")</small>
-                                    </div>
-                                </div>
-                            </div>
-                            @if (Model.Status == "Shipped" || Model.Status == "Delivered")
-                            {
-                                <div class="activity-item">
-                                    <div class="d-flex">
-                                        <span class="activity-badge activity-badge-warning">
-                                            <i class="bi bi-truck"></i>
-                                        </span>
-                                        <div>
-                                            <p class="mb-1">Status updated to Shipped</p>
-                                            <small class="text-muted">@Model.OrderDate.AddDays(1).ToString("MMM dd, yyyy - hh:mm tt")</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                            @if (Model.Status == "Delivered")
-                            {
-                                <div class="activity-item">
-                                    <div class="d-flex">
-                                        <span class="activity-badge activity-badge-success">
-                                            <i class="bi bi-check-circle"></i>
-                                        </span>
-                                        <div>
-                                            <p class="mb-1">Status updated to Delivered</p>
-                                            <small class="text-muted">@Model.OrderDate.AddDays(3).ToString("MMM dd, yyyy - hh:mm tt")</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
             </div>
             
-            <!-- Right Column: Customer Details & Status Timeline -->
             <div class="col-lg-4">
-                <!-- Customer Details Card -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="bi bi-person me-2"></i>Customer Information
-                    </div>
-                    <div class="card-body">
-                        <div class="order-info-item">
-                            <span class="customer-info-label">Name</span>
-                            <span class="customer-info-value">John Doe</span>
-                        </div>
-                        <div class="order-info-item">
-                            <span class="customer-info-label">Email</span>
-                            <span class="customer-info-value">john.doe@example.com</span>
-                        </div>
-                        <div class="order-info-item">
-                            <span class="customer-info-label">Phone</span>
-                            <span class="customer-info-value">@Model.PhoneNumber</span>
-                        </div>
-                        <div class="order-info-item">
-                            <span class="customer-info-label">Customer Since</span>
-                            <span class="customer-info-value">Jan 15, 2025</span>
-                        </div>
-                        <div class="order-info-item">
-                            <span class="customer-info-label">Total Orders</span>
-                            <span class="customer-info-value">5</span>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Shipping Information Card -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -540,77 +418,17 @@
                             <span class="customer-info-value">@Model.ShippingAddress</span>
                         </div>
                         <div class="order-info-item">
+                            <span class="customer-info-label">Phone</span>
+                            <span class="customer-info-value">@Model.PhoneNumber</span>
+                        </div>
+                        <div class="order-info-item">
                             <span class="customer-info-label">Method</span>
                             <span class="customer-info-value">Standard Shipping</span>
                         </div>
-                        <div class="order-info-item">
-                            <span class="customer-info-label">Est. Delivery</span>
-                            <span class="customer-info-value">@Model.OrderDate.AddDays(5).ToString("MMM dd, yyyy")</span>
-                        </div>
                         
-                    </div>
-                </div>
-                
-                <!-- Order Status Timeline Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-graph-up me-2"></i>Status Timeline
-                    </div>
-                    <div class="card-body">
-                        <div class="timeline">
-                            <div class="timeline-step completed">
-                                <div class="timeline-content">Order Placed</div>
-                                <div class="timeline-date">@Model.OrderDate.ToString("MMM dd, yyyy")</div>
-                            </div>
-                            <div class="timeline-step completed">
-                                <div class="timeline-content">Processing</div>
-                                <div class="timeline-date">@Model.OrderDate.AddHours(1).ToString("MMM dd, yyyy")</div>
-                            </div>
-                            <div class="timeline-step @(Model.Status == "Shipped" || Model.Status == "Delivered" ? "completed" : "active")">
-                                <div class="timeline-content">Shipped</div>
-                                <div class="timeline-date">@(Model.Status == "Shipped" || Model.Status == "Delivered" ? Model.OrderDate.AddDays(1).ToString("MMM dd, yyyy") : "-")</div>
-                            </div>
-                            <div class="timeline-step @(Model.Status == "Delivered" ? "completed" : "")">
-                                <div class="timeline-content">Delivered</div>
-                                <div class="timeline-date">@(Model.Status == "Delivered" ? Model.OrderDate.AddDays(3).ToString("MMM dd, yyyy") : "-")</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show/hide shipping options based on selected status
-            const statusSelect = document.getElementById('orderStatus');
-            const shippedOptions = document.querySelector('.shipped-options');
-            
-            function toggleShippingOptions() {
-                if (statusSelect.value === 'Shipped') {
-                    shippedOptions.classList.remove('d-none');
-                } else {
-                    shippedOptions.classList.add('d-none');
-                }
-            }
-            
-            // Initial setup
-            toggleShippingOptions();
-            
-            // Listen for changes
-            statusSelect.addEventListener('change', toggleShippingOptions);
-            
-            // Confirmation before cancellation
-            document.querySelectorAll('.text-danger').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
-                        e.preventDefault();
-                    }
-                });
-            });
-        });
-    </script>
-}
