@@ -22,19 +22,10 @@ public class HomeController : Controller
     {
         return View();
     }
-    public async Task<IActionResult> GetHomePageData(BookFilterModel filter)
+    public async Task<IActionResult> GetHomePageData()
     {
-        var bookFilterDto = _mapper.Map<BookFilterDto>(filter);
-        var books = await _bookService.GetFilteredBooksAsync(bookFilterDto);
-        var bookGenres = await _bookService.GetAllGenresAsync();
-        var homeVM = new HomeVM
-        {
-            Books = books,
-            BookGenres = bookGenres,
-            SelectedGenre = filter.Genre,
-            MaxPrice = filter.MaxPrice,
-        };
-        return Ok(homeVM);
+        var booksWithGenres = await _bookService.GetBooksWithGenresAsync();
+        return Ok(booksWithGenres);
     }
     public IActionResult Privacy()
     {
@@ -46,5 +37,4 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
-
 }

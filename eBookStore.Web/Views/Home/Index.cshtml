@@ -183,5 +183,39 @@
 
             loadBooks();
         });
+
+        function saveToLocalStorage(key, data) {
+            const payload = {
+                data: data,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem(key, JSON.stringify(payload));
+        }
+
+        function getFromLocalStorage(key, maxMinutes = 10) {
+            const item = localStorage.getItem(key);
+            if (!item) return null;
+
+            try {
+                const parsed = JSON.parse(item);
+                const now = new Date().getTime();
+                const elapsedTimeInMinutes = (now - parsed.timestamp) / (1000 * 60);
+
+                if (elapsedTimeInMinutes > maxMinutes) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return parsed.data;
+            } catch (error) {
+                console.error("Failed to parse localStorage data", error);
+                localStorage.removeItem(key);
+                return null;
+            }
+        }
+
+
+
     </script>
+
+
 }

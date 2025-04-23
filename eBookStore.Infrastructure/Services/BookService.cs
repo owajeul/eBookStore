@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using eBookStore.Application.Common.Dto;
 using eBookStore.Application.Common.Interfaces;
 using eBookStore.Application.Common.Utilily;
@@ -14,17 +15,16 @@ namespace eBookStore.Infrastructure.Services;
 public class BookService : IBookService
 {
     private readonly IBookRepository _bookRepository;
-    public BookService(IBookRepository bookRepository)
+    private readonly IMapper _mapper;
+
+    public BookService(IBookRepository bookRepository, IMapper mapper)
     {
         _bookRepository = bookRepository;
+        _mapper = mapper;
     }
 
-    public async Task<List<Book>> GetAllBooksAsync(string? genre = null)
+    public async Task<List<Book>> GetAllBooksAsync()
     {
-        if (!string.IsNullOrEmpty(genre))
-        {
-            return await _bookRepository.GetAllAsync(b => b.Genre.ToLower() == genre.ToLower());
-        }
         return await _bookRepository.GetAllAsync();
     }
 
@@ -39,6 +39,16 @@ public class BookService : IBookService
         return await _bookRepository.Get(b => b.Id == id);
     }
 
+    public async Task<BookWithGenresDto> GetBooksWithGenresAsync()
+    {
+        var books = await _bookRepository.GetAllAsync();
+        var genres = books.Select(b => b.Genre).Distinct().ToList();
+        return new BookWithGenresDto
+        {
+            Books = _mapper.Map<List<BookDto>>(books),
+            Genres = genres
+        };
+    }
     public async Task<List<Book>> GetFilteredBooksAsync(BookFilterDto filter)
     {
         var books = await _bookRepository.GetAllAsync();
