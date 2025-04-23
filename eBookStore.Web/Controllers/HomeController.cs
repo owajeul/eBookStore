@@ -1,5 +1,8 @@
 using System.Diagnostics;
+using AutoMapper;
+using eBookStore.Application.Common.Dto;
 using eBookStore.Application.Common.Interfaces;
+using eBookStore.Domain.Entities;
 using eBookStore.Web.Models;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -8,21 +11,21 @@ namespace eBookStore.Web.Controllers;
 public class HomeController : Controller
 {
     private readonly IBookService _bookService;
-    public HomeController(IBookService bookService)
+    private readonly IMapper _mapper;
+
+    public HomeController(IBookService bookService, IMapper mapper)
     {
         _bookService = bookService;
+        _mapper = mapper;
     }
-    public async Task<IActionResult> Index(string? genre)
+    public IActionResult Index()
     {
-        var books = await _bookService.GetAllBooksAsync(genre);
-        var bookGenres = await _bookService.GetAllGenresAsync();
-        var homeVM = new HomeVM
-        {
-            Books = books,
-            BookGenres = bookGenres,
-            SelectedGenre = genre
-        };
-        return View(homeVM);
+        return View();
+    }
+    public async Task<IActionResult> GetHomePageData()
+    {
+        var booksWithGenres = await _bookService.GetBooksWithGenresAsync();
+        return Ok(booksWithGenres);
     }
     public IActionResult Privacy()
     {

@@ -9,41 +9,53 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/eBookStore.Web.styles.css" asp-append-version="true" />
-
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">eBookStore.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminBook" asp-action="Index">Book</a>
-                        </li>
-                          <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="AdminOrder" asp-action="Index">Order</a>
-                        </li>
-
-
-                    </ul>
-
-					@await Component.InvokeAsync("CartIcon")
-					<partial name="_LoginPartial" />
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2">
+        <div class="container">
+            <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-book me-2"></i>eBookStore
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse">
+                    <div class="d-flex flex-grow-1 mx-lg-4 my-2 my-lg-0 position-relative" style="max-width: 400px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                            <input type="text" id="searchInput" class="form-control border-start-0 bg-light" autocomplete="off" placeholder="Search book by title, author, genre">
+                    </div>
+                    <ul id="autocompleteList" class="list-group position-absolute mt-5 w-100 d-none" style="z-index: 1050;"></ul>
+                </div>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="AdminBook" asp-action="Index">Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="AdminOrder" asp-action="Index">Orders</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    @await Component.InvokeAsync("CartIcon")
+                    <div class="ms-3">
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
     <div class="container">
         <partial name="_NotificationPartial" />
         <main role="main" class="pb-3">
@@ -59,6 +71,71 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/localStorageUtil.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+
+    <script>
+        const BOOK_DATA_KEY = 'homepagedata';
+        const MAX_DURATION_MINUTES = 10;
+        const API_URL = '/home/gethomepagedata';
+        let fuse = null;
+        function loadBooksDataOnFuse() {
+            const savedData = localStorageUtil.getFromLocalStorage(BOOK_DATA_KEY, MAX_DURATION_MINUTES);
+            if(!savedData) {
+                $.ajax({
+                        url: API_URL,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response && response.books) {
+                                localStorageUtil.saveToLocalStorage(HOMEPAGE_KEY, response);
+                                fuse = new Fuse(response.books, {
+                                    keys: ['title', 'author', 'genre'],
+                                    threshold: 0.3
+                                });
+                            } else {
+                                console.error("An error occurred loading book data", response);
+                            }
+                        },
+                        error: function (error) {
+                            console.error("Error fetching data from API", error);
+                        }
+                    });
+            }
+            fuse = new Fuse(savedData.books, {
+                keys: ['title', 'author', 'genre'],
+                threshold: 0.3
+            });
+        }
+
+        $('#searchInput').on('input', function () {
+            const query = $(this).val();
+            const $list = $('#autocompleteList');
+            $list.empty().addClass('d-none');
+
+            if (!query || !fuse) return;
+
+            const results = fuse.search(query).slice(0, 5);
+            console.log('layout ', query, results);
+            console.log(results);
+            if (results.length > 0) {
+                results.forEach(({ item }) => {
+                    $list.append(`
+                    <li class="list-group-item">
+                        <a href="/book/details/${item.id}" class="text-decoration-none">
+                            ${item.title} <small class="ms-1 text-muted">by ${item.author}</small>
+                            <span class="badge bg-light text-dark float-end">${item.genre}</span>
+                        </a>
+                    </li>
+                    `);
+                });
+                $list.removeClass('d-none');
+            }
+        });
+        loadBooksDataOnFuse();
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
