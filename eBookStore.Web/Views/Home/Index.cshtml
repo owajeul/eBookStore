@@ -83,7 +83,7 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/localStorageUtil.js"></script>
+    
     <script> 
             $(document).ready(function () {
             const $bookList = $('#bookList');
@@ -188,6 +188,7 @@
                 loadBooks();
             });
 
+
             
 
             const HOMEPAGE_KEY = 'homepagedata';
@@ -195,7 +196,6 @@
             const API_URL = '/home/gethomepagedata';
 
             let allBooks = [];
-            let allGenres = [];
 
             function fetchDataFromAPI() {
                 $.ajax({
@@ -240,6 +240,7 @@
                     fetchDataFromAPI();
                     console.log("Data loaded from API");
                 }
+
             }
 
             loadHomepage();
