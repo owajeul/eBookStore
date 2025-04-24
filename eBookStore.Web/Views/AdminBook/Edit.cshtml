@@ -1,6 +1,5 @@
 ﻿@model Book
 @{
-    Layout = "_AdminLayout";
     ViewData["Title"] = "Edit Book";
 }
 
@@ -343,13 +342,10 @@
 
             <!-- Form Actions -->
             <div class="form-actions">
-                <a asp-action="Index" class="btn btn-back">
-                    <i class="fas fa-arrow-left me-2"></i>Back to List
+                <a asp-action="Details" asp-controller="Book" asp-route-id="@Model.Id" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Back to details
                 </a>
                 <div>
-                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary me-2">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
                     <button type="submit" class="btn btn-submit text-white">
                         <i class="fas fa-save me-2"></i>Save Changes
                     </button>

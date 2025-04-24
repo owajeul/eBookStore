@@ -1,8 +1,11 @@
-﻿using eBookStore.Application.Common.Utilily;
+﻿using eBookStore.Application.Common.Interfaces;
+using eBookStore.Application.Common.Utilily;
+using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data.Identity;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace eBookStore.Web.Controllers
 {
@@ -11,13 +14,16 @@ namespace eBookStore.Web.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly ICartService _cartService;
 
         public AccountController(
             ILogger<AccountController> logger,
+            ICartService cartService,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
+            _cartService = cartService;
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -49,6 +55,7 @@ namespace eBookStore.Web.Controllers
                     {
                         return RedirectToAction("Index", "Dashboard");
                     }
+                    await MergeCartOnLogin();
                     return RedirectUser(loginVM.RedirectUrl);
                 }
                 _logger.LogWarning("Failed login attempt for {Email}.", loginVM.Email);
@@ -116,5 +123,41 @@ namespace eBookStore.Web.Controllers
                 return RedirectToAction("Index", "Home");
             return LocalRedirect(redirectUrl);
         }
+
+        private async Task MergeCartOnLogin()
+        {
+            var userId = _userManager.GetUserId(User);
+            var sessionCartJson = HttpContext.Session.GetString("Cart");
+            var dbCart = await _cartService.GetUserCartAsync(userId);
+
+            if (!string.IsNullOrEmpty(sessionCartJson))
+            {
+                var sessionCart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+
+                if (dbCart == null)
+                {
+                    sessionCart.UserId = userId;
+                    sessionCart.CreatedAt = DateTime.UtcNow;
+                    _cartService.UpdateCart(sessionCart);
+                }
+                else
+                {
+                    foreach (var item in sessionCart.CartItems)
+                    {
+                        if (await _cartService.IsBookInCartAsync(userId, item.BookId))
+                        {
+                            await _cartService.AddQuantityAsync(dbCart.Id, item.BookId, item.Quantity);
+                        }
+                        else
+                        {
+                            await _cartService.AddToCartAsync(userId, item.BookId, item.Quantity);
+                        }
+                    }
+                }
+
+                HttpContext.Session.Remove("Cart");
+            }
+        }
+
     }
 }

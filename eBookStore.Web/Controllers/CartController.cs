@@ -8,71 +8,159 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
-namespace eBookStore.Web.Controllers
+namespace eBookStore.Web.Controllers;
+
+public class CartController : Controller
 {
-    [Authorize]
-    public class CartController : Controller
+    private readonly ICartService _cartService;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IBookService _bookService;
+
+    public CartController(ICartService cartService, UserManager<ApplicationUser> userManager, IBookService bookService)
     {
-        private readonly ICartService _cartService;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public CartController(ICartService cartService, UserManager<ApplicationUser> userManager)
+        _cartService = cartService;
+        _userManager = userManager;
+        _bookService = bookService;
+    }
+    public async Task<IActionResult> Index()
+    {
+        Cart cart = new Cart();
+
+        if (User.Identity.IsAuthenticated)
         {
-            _cartService = cartService;
-            _userManager = userManager;
+            cart = await _cartService.GetUserCartWithItemsAsync(_userManager.GetUserId(User));
         }
-        public async Task<IActionResult> Index()
+        else
         {
-            var cart = await _cartService.GetUserCartWithItemsAsync(_userManager.GetUserId(User));
-            decimal subtotal = 0;
-            decimal shippingCosts = 0;
-            foreach (var item in cart.CartItems)
+            var sessionCartJson = HttpContext.Session.GetString("Cart");
+
+            if (!string.IsNullOrEmpty(sessionCartJson))
             {
-                subtotal += item.Quantity * item.UnitPrice;
+                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
             }
-
-            ViewBag.Subtotal = subtotal;
-            ViewBag.ShippingCosts = shippingCosts;
-            ViewBag.TotalCosts = subtotal + shippingCosts;
-            return View(cart);
         }
 
-        public async Task<IActionResult> Add(int bookId)
+        decimal subtotal = 0;
+        decimal shippingCosts = 0;
+
+        foreach (var item in cart.CartItems)
+        {
+            subtotal += item.Quantity * item.UnitPrice;
+        }
+
+        ViewBag.Subtotal = subtotal;
+        ViewBag.ShippingCosts = shippingCosts;
+        ViewBag.TotalCosts = subtotal + shippingCosts;
+
+        return View(cart);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add(int bookId)
+    {
+        var response = new { message = "" , status = ""};
+
+        if (User.Identity.IsAuthenticated)
         {
             var userId = _userManager.GetUserId(User);
-
-            if(await _cartService.IsBookInCartAsync(userId, bookId))
+            if (await _cartService.IsBookInCartAsync(userId, bookId))
             {
-                TempData["ToastrMessage"] = "Book already in cart!";
-                TempData["ToastrType"] = "warning";
+                return Ok(new {message = "Book already in cart!" , status = "warning"});
             }
             else
             {
-                await _cartService.AddToCartAsync(userId, bookId);           
-                TempData["ToastrMessage"] = "Book added to cart successfully!";
-                TempData["ToastrType"] = "success";
+                await _cartService.AddToCartAsync(userId, bookId);
+                return Ok(new { message = "Book successfully added to cart" , status = "success"});
             }
-            return RedirectToAction("Details", "Book", new {id = bookId});
         }
+        else
+        {
+            var sessionCartJson = HttpContext.Session.GetString("Cart");
+            var cart = new Cart();
+            if (!string.IsNullOrEmpty(sessionCartJson))
+            {
+                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+            }
 
-        public async Task<IActionResult> IncreaseBookQuantity(int cartId, int bookId)
-        {
-            await _cartService.IncreaseQuantityAsync(cartId, bookId);
-            return RedirectToAction("Index");
-        }
-        public async Task<IActionResult> DecreaseBookQuantity(int cartId, int bookId)
-        {
-            await _cartService.DecreaseQuantityAsync(cartId, bookId);
-            return RedirectToAction("Index");
-        }
+            var bookExistInCart = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
 
-        public async Task<IActionResult> DeleteCartItem(int cartId, int bookId)
-        {
-            var userId = _userManager.GetUserId(User);
-            await _cartService.RemoveFromCartAsync(cartId, bookId);
-            TempData["ToastrMessage"] = "Book removed from cart successfully!";
-            TempData["ToastrType"] = "success";
-            return RedirectToAction("Index");
+            if(bookExistInCart != null)
+            {
+                return Ok(new { message = "Book already in cart!" , status = "warning"});
+            }
+            else
+            {
+                var book = await _bookService.GetBookAsync(bookId);
+                cart.CartItems.Add(new CartItem
+                {
+                    BookId = book.Id,
+                    Book = book,
+                    Quantity = 1,
+                    UnitPrice = book.Price
+                });
+            }
+            HttpContext.Session.SetString("Cart", JsonConvert.SerializeObject(cart));
+            return Ok(new { message = "Book successfully added to cart" , status = "success" });
         }
     }
+
+    public async Task<IActionResult> IncreaseBookQuantity(int cartId, int bookId)
+    {
+        if(User.Identity.IsAuthenticated)
+        {
+            await _cartService.IncreaseQuantityAsync(cartId, bookId);
+        }
+        else
+        {
+            var sessionCartJson = HttpContext.Session.GetString("Cart");
+            var cart = new Cart();
+            if (!string.IsNullOrEmpty(sessionCartJson))
+            {
+                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+            }
+
+            var cartItem = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
+            cartItem.Quantity += 1;
+
+            HttpContext.Session.SetString("Cart", JsonConvert.SerializeObject(cart));
+        }
+        return Ok();
+    }
+    public async Task<IActionResult> DecreaseBookQuantity(int cartId, int bookId)
+    {
+        if(User.Identity.IsAuthenticated)
+        {
+            await _cartService.DecreaseQuantityAsync(cartId, bookId);
+        }
+        else
+        {
+            var sessionCartJson = HttpContext.Session.GetString("Cart");
+            var cart = new Cart();
+            if (!string.IsNullOrEmpty(sessionCartJson))
+            {
+                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+            }
+
+            var cartItem = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
+
+            if(cartItem.Quantity > 1)
+            {
+                cartItem.Quantity -= 1;
+            }
+
+            HttpContext.Session.SetString("Cart", JsonConvert.SerializeObject(cart));
+        }
+        return Ok();
+    }
+
+
+    public async Task<IActionResult> DeleteCartItem(int cartId, int bookId)
+    {
+        var userId = _userManager.GetUserId(User);
+        await _cartService.RemoveFromCartAsync(cartId, bookId);
+        return Ok();
+    }
+
 }

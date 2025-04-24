@@ -375,3 +375,7 @@ media (max-width: 991.98px) {
 }
 }
 
+
+.btn {
+    box-shadow:none !important;
+}

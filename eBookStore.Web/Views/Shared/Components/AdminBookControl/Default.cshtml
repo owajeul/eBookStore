@@ -1,0 +1,69 @@
+﻿@model BookStockAndSalesVM
+@{
+    int bookId = Model.Id;
+}
+<div class="card border-0 shadow-sm rounded-3 mb-3">
+    <div class="card-header bg-danger text-white py-1 px-3">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-shield-lock me-2"></i>
+                <small class="fw-bold">Admin Quick Controls</small>
+            </div>
+            <a asp-action="Edit" asp-controller="AdminBook" asp-route-id="@Model.Id"
+               class="btn btn-sm btn-primary" title="Full Edit">
+                <i class="bi bi-pencil-square"></i> Edit Book
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-3">
+        <div class="row g-2 align-items-center">
+            <!-- Stock Input -->
+            <div class="col-auto">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light px-3 py-1">Stock</span>
+                    <input type="number" class="form-control form-control-sm px-2 py-1" style="width: 70px;"
+                           id="stockInput" value="@Model.Stock" min="0">
+                    <button class="btn btn-sm btn-outline-danger px-2 py-1" type="button" id="updateStockBtn">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+        $(document).ready(function() {
+        const $stockInput = $('#stockInput');
+        const $updateStockBtn = $('#updateStockBtn');
+        console.log('book admin control');
+        $updateStockBtn.on('click', function() {
+            const bookId = @Model.Id;
+            const stockValue = $stockInput.val();
+            console.log(bookId, stockValue);
+            $updateStockBtn.prop('disabled', true);
+            $updateStockBtn.html('<i class="bi bi-hourglass-split"></i>');
+
+            $.ajax({
+                url: '/AdminBook/UpdateBookStock',
+                type: 'POST',
+                data: {
+                    id: bookId,
+                    stock: stockValue
+                },
+                success: function(response) {
+					toastr["success"]("Stock updated successfully!");
+                },
+                error: function(xhr, status, error) {
+                    toastr["error"]("Failed to update stock");
+                    console.error(error);
+                },
+                complete: function() {
+                    $updateStockBtn.prop('disabled', false);
+                    $updateStockBtn.html('<i class="bi bi-arrow-repeat"></i>');
+                }
+            });
+        });
+    });
+</script>
