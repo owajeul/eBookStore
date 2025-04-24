@@ -31,20 +31,19 @@
                             <form method="post" asp-action="PlaceOrder" id="checkoutForm">
                                 <div class="mb-4">
                                     <label asp-for="ShippingAddress" class="form-label fw-semibold">Delivery Address</label>
-                                    <textarea asp-for="ShippingAddress" class="form-control form-control-lg rounded-3 border-primary-subtle" rows="3" placeholder="Enter your complete address"></textarea>
+                                    <textarea asp-for="ShippingAddress" class="form-control form-control-lg rounded-3 border-primary-subtle" rows="3" placeholder="Enter your complete address" required></textarea>
                                     <span asp-validation-for="ShippingAddress" class="text-danger small"></span>
                                     <div class="form-text">We'll deliver your books to this address</div>
                                 </div>
                                 <div class="mb-4">
                                     <label asp-for="PhoneNumber" class="form-label fw-semibold">Contact Number</label>
                                     <div class="input-group input-group-lg">
-                                        <span class="input-group-text bg-light border-primary-subtle">
-                                            <i class="bi bi-telephone"></i>
-                                        </span>
-                                        <input asp-for="PhoneNumber" class="form-control rounded-end border-primary-subtle" placeholder="For delivery coordination" />
+                                        <span class="input-group-text bg-light border-primary-subtle"><i class="bi bi-telephone"></i> +88</span>
+                                        <input asp-for="PhoneNumber" class="form-control rounded-end border-primary-subtle" placeholder="01XXXXXXXXX" maxlength="11" id="phoneNumberInput" required/>
                                     </div>
                                     <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                                 </div>
+
 
                                 <!-- Payment Method Selector -->
                                 <div class="mb-2">
