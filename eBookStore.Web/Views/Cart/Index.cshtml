@@ -99,27 +99,9 @@
             <!-- Summary Section -->
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 sticky-md-top" style="top: 2rem;">
-                    <div class="card-header bg-white py-3 border-0">
-                        <h5 class="mb-0 fw-bold">Order Summary</h5>
-                    </div>
                     <div class="card-body">
-                        <ul class="list-group list-group-flush mb-4">
-                            <li class="list-group-item border-0 d-flex justify-content-between px-0">
-                                <span class="text-muted">Subtotal</span>
-                                <span class="fw-medium">@ViewBag.Subtotal</span>
-                            </li>
-                            <li class="list-group-item border-0 d-flex justify-content-between px-0">
-                                <span class="text-muted">Shipping</span>
-                                <span class="fw-medium">@ViewBag.ShippingCosts</span>
-                            </li>
-                            <li class="list-group-item border-0 d-flex justify-content-between px-0 py-3">
-                                <span class="fw-bold">Total</span>
-                                <span class="fw-bold text-primary fs-5">@ViewBag.TotalCosts</span>
-                            </li>
-                        </ul>
-
                         <div class="d-grid gap-2">
-                            <a asp-controller="Order" asp-action="Index" class="btn btn-primary btn-lg">
+                            <a asp-controller="Order" asp-action="Index" class="btn btn-primary btn-lg py-3">
                                 Proceed to Checkout
                                 <i class="bi bi-arrow-right ms-2"></i>
                             </a>

@@ -45,4 +45,15 @@ public class CartRepository : Repository<Cart>, ICartRepository
     {
         _dbContext.CartItems.Remove(cartItem);
     }
+    public async Task ClearCartAsync(string userId)
+    {
+        var cart = await _dbContext.Carts
+            .Include(c => c.CartItems)
+            .FirstOrDefaultAsync(c => c.UserId == userId);
+        if (cart != null)
+        {
+            _dbContext.CartItems.RemoveRange(cart.CartItems);
+        }
+    }
+
 }
