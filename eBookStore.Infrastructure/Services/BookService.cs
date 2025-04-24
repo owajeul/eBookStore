@@ -9,6 +9,8 @@ using eBookStore.Application.Common.Dto;
 using eBookStore.Application.Common.Interfaces;
 using eBookStore.Application.Common.Utilily;
 using eBookStore.Domain.Entities;
+using eBookStore.Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace eBookStore.Infrastructure.Services;
 
@@ -72,5 +74,23 @@ public class BookService : IBookService
             }
         }
         return books;
+    }
+
+    public async Task<BookStockAndSalesDto> GetBookStockAsync(int id)
+    {
+        var book = await _bookRepository.Get(b => b.Id == id);
+        return new BookStockAndSalesDto
+        {
+            Id = book.Id,
+            Stock = book.Stock
+        };
+    }
+
+    public async Task UpdateBookStockAsync(int id, int stock)
+    {
+        var book = await _bookRepository.Get(b => b.Id == id);
+        book.Stock = stock;
+        _bookRepository.Update(book);
+        await _bookRepository.Save();
     }
 }

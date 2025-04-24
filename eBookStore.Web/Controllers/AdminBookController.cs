@@ -7,9 +7,12 @@ namespace eBookStore.Web.Controllers;
 public class AdminBookController : Controller
 {
     private readonly IBookRepository _bookRepository;
-    public AdminBookController(IBookRepository bookRepository)
+    private readonly IBookService _bookService;
+
+    public AdminBookController(IBookRepository bookRepository, IBookService bookService)
     {
         _bookRepository = bookRepository;
+        _bookService = bookService;
     }
     public async Task<IActionResult> Index()
     {
@@ -93,4 +96,14 @@ public class AdminBookController : Controller
         return RedirectToAction("Index", "Dashboard");
     }
 
+    [HttpPost]
+    public async Task<IActionResult> UpdateBookStock(int id, int stock)
+    {
+        if(stock < 0)
+        {
+            return BadRequest("Stock cannot be negative.");
+        }
+        await _bookService.UpdateBookStockAsync(id, stock);
+        return Ok(new {message = "Stock updated successfully", status = "success"});
+    }
 }

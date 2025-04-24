@@ -8,10 +8,12 @@ namespace eBookStore.Application.Services;
 public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly ICartRepository _cartRepository;
 
-    public OrderService(IOrderRepository orderRepository)
+    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository)
     {
         _orderRepository = orderRepository;
+        _cartRepository = cartRepository;
     }
 
     public async Task<Order> PlaceOrderAsync(OrderDto orderDto)
@@ -32,6 +34,7 @@ public class OrderService : IOrderService
         };
 
         await _orderRepository.Add(order);
+        await _cartRepository.ClearCartAsync(orderDto.UserId);
         await _orderRepository.Save();
         return order;
     }
@@ -40,4 +43,5 @@ public class OrderService : IOrderService
     {
         return await _orderRepository.GetOrdersByUserIdAsync(userId);
     }
+    
 }

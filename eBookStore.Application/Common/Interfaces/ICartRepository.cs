@@ -10,4 +10,5 @@ public interface ICartRepository: IRepository<Cart>
     Task<bool> IsBookInCartAsync(string userId, int bookId);
     void RemoveCartItem(CartItem cartItem);
     void UpdateCartItem(CartItem cartItem);
+    Task ClearCartAsync(string userId);
 }

@@ -75,6 +75,18 @@
     <script src="~/js/localStorageUtil.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+	<script>
+         toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "2000"
+        };
+    </script>
+
     <script>
         const BOOK_DATA_KEY = 'homepagedata';
         const MAX_DURATION_MINUTES = 10;
@@ -136,6 +148,8 @@
         loadBooksDataOnFuse();
     </script>
     @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("ComponentScripts", required: false)
+
 
 </body>
 </html>

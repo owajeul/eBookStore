@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using eBookStore.Application.Common.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
+using eBookStore.Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace eBookStore.Infrastructure.Repositories;
 
@@ -21,4 +23,5 @@ public class BookRepository : Repository<Book>, IBookRepository
         var book = await _dbContext.Books.FindAsync(bookId);
         return book.Price;
     }
+
 }

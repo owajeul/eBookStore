@@ -13,6 +13,7 @@ namespace eBookStore.Web.Mapping
             CreateMap<TopSellingBookDto, TopSellingBookVM>();
             CreateMap<BookDto, BookVM>();
             CreateMap<BookFilterModel, BookFilterDto>();
+            CreateMap<BookStockAndSalesDto, BookStockAndSalesVM>();
         }
     }
 }

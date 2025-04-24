@@ -23,7 +23,7 @@ public class CartService : ICartService
             ?? new Cart { UserId = userId, CartItems = new List<CartItem>(), CreatedAt = DateTime.UtcNow };
     }
 
-    public async Task AddToCartAsync(string userId, int bookId)
+    public async Task AddToCartAsync(string userId, int bookId, int quantity = 1)
     {
         var cart = await _cartRepository.GetUserCartWithItemsAsync(userId);
 
@@ -44,7 +44,7 @@ public class CartService : ICartService
         cart.CartItems.Add(new CartItem
         {
             BookId = bookId,
-            Quantity = 1,
+            Quantity = quantity,
             UnitPrice = price
         });
 
@@ -84,6 +84,20 @@ public class CartService : ICartService
         {
             _cartRepository.RemoveCartItem(cartItem);
         }
+        await _cartRepository.Save();
+    }
+
+    public void UpdateCart(Cart cart)
+    {
+       _cartRepository.Update(cart);
+    }
+
+    public async Task AddQuantityAsync(int cartId, int bookId, int quantity)
+    {
+        var item = await _cartRepository.GetCartItemAsync(cartId, bookId);
+        if (item == null) return;
+        item.Quantity += quantity;
+        _cartRepository.UpdateCartItem(item);
         await _cartRepository.Save();
     }
 }
