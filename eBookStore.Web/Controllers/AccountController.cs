@@ -15,15 +15,18 @@ namespace eBookStore.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
         private readonly ICartService _cartService;
+        private readonly IOrderService _orderService;
 
         public AccountController(
             ILogger<AccountController> logger,
             ICartService cartService,
+            IOrderService orderService,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _cartService = cartService;
+            _orderService = orderService;
             _signInManager = signInManager;
             _userManager = userManager;
         }
@@ -157,6 +160,26 @@ namespace eBookStore.Web.Controllers
 
                 HttpContext.Session.Remove("Cart");
             }
+        }
+
+        public async Task<IActionResult> Profile()
+        {
+            var orderHistory = await _orderService.GetUserOrdersAsync(_userManager.GetUserId(User));
+            var user = await _userManager.GetUserAsync(User);
+            var userInfoVM = new UserVM
+            {
+                UserId = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+            };
+
+            var profileViewModel = new ProfileVM
+            {
+                UserInfo = userInfoVM,
+                OrderHistory = orderHistory
+            };
+            return View(profileViewModel);
         }
 
     }

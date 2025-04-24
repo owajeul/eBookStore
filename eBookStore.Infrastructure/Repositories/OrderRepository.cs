@@ -17,8 +17,9 @@ namespace eBookStore.Infrastructure.Repositories
         public async Task<List<Order>> GetOrdersByUserIdAsync(string userId)
         {
             return await _dbContext.Orders
-                .Include(o => o.OrderItems)
                 .Where(o => o.UserId == userId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Book)
                 .ToListAsync();
         }
 
