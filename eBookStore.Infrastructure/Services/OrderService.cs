@@ -1,4 +1,5 @@
-﻿using eBookStore.Application.Common.Dto;
+﻿using AutoMapper;
+using eBookStore.Application.Common.Dto;
 using eBookStore.Application.Common.Interfaces;
 using eBookStore.Application.Common.Utilily;
 using eBookStore.Domain.Entities;
@@ -9,11 +10,13 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly ICartRepository _cartRepository;
+    private readonly IMapper _mapper;
 
-    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository)
+    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository, IMapper mapper)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
+        _mapper = mapper;
     }
 
     public async Task<Order> PlaceOrderAsync(OrderDto orderDto)
@@ -39,9 +42,10 @@ public class OrderService : IOrderService
         return order;
     }
 
-    public async Task<List<Order>> GetUserOrdersAsync(string userId)
+    public async Task<List<OrderDto>> GetUserOrdersAsync(string userId)
     {
-        return await _orderRepository.GetOrdersByUserIdAsync(userId);
+       var orders = await _orderRepository.GetOrdersByUserIdAsync(userId);
+       return _mapper.Map<List<OrderDto>>(orders);
     }
     
 }

@@ -14,6 +14,8 @@ namespace eBookStore.Infrastructure.Mapping
         public InfrastructureMappingProfile()
         {
             CreateMap<Book, BookDto>();
+            CreateMap<Order, OrderDto>();
+            CreateMap<OrderItem, OrderItemDto>();
         }
     }
 }

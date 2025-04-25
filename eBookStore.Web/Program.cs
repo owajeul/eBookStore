@@ -29,6 +29,7 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddScoped<DbInitializer>();
 

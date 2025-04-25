@@ -5,6 +5,6 @@ namespace eBookStore.Application.Common.Interfaces;
 
 public interface IOrderService
 {
-    Task<List<Order>> GetUserOrdersAsync(string userId);
+    Task<List<OrderDto>> GetUserOrdersAsync(string userId);
     Task<Order> PlaceOrderAsync(OrderDto orderDto);
 }

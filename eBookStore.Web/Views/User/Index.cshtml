@@ -1,0 +1,389 @@
+﻿@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container py-4">
+    <!-- Profile Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">My Profile</h2>
+        </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="row g-4">
+        <!-- Left Column - User Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-person-circle" style="font-size: 5rem;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">John Doe</h4>
+                    <p class="text-muted mb-3">john.doe@example.com</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" type="button">
+                            <i class="bi bi-pencil me-2"></i>Edit Profile
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-key me-2"></i>Change Password
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="small text-muted">Full Name</div>
+                        <div>John Doe</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="small text-muted">Email Address</div>
+                        <div>john.doe@example.com</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="small text-muted">Phone Number</div>
+                        <div>+1 (555) 123-4567</div>
+                    </div>
+                    <div>
+                        <div class="small text-muted">Member Since</div>
+                        <div>January 12, 2023</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reading Preferences -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Reading Preferences</h5>
+                    <button class="btn btn-sm btn-link text-decoration-none p-0">Edit</button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="badge bg-primary rounded-pill me-1">Science Fiction</span>
+                        <span class="badge bg-primary rounded-pill me-1">Mystery</span>
+                        <span class="badge bg-primary rounded-pill">Fantasy</span>
+                    </div>
+                    <div class="text-muted small mt-2">
+                        <i class="bi bi-info-circle me-1"></i>
+                        These preferences help us recommend books you might enjoy
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Order History -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Order History</h5>
+                </div>
+                <div class="card-body p-0">
+                    <!-- Order 1 -->
+                    <div class="card border-0 mb-0 rounded-0 border-bottom">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-1">Order #12345</h6>
+                                    <p class="text-muted small mb-0">April 15, 2025</p>
+                                </div>
+                                <div class="col-md-3 text-md-center my-2 my-md-0">
+                                    <span class="badge bg-success">Completed</span>
+                                </div>
+                                <div class="col-md-3 text-md-end">
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#orderDetails1">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="orderDetails1">
+                            <div class="card-body pt-0 pb-3 px-3 bg-light">
+                                <div class="row g-3">
+                                    <!-- Book 1 -->
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 80px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">The Midnight Library</h6>
+                                                <p class="text-muted small mb-1">By Matt Haig</p>
+                                                <p class="small mb-0">Digital Edition • $12.99</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Book 2 -->
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 80px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">Project Hail Mary</h6>
+                                                <p class="text-muted small mb-1">By Andy Weir</p>
+                                                <p class="small mb-0">Digital Edition • $14.99</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <hr class="my-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-bold">Total:</span>
+                                            <span class="fw-bold">$27.98</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="#" class="btn btn-sm btn-primary">Download Books</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order 2 -->
+                    <div class="card border-0 mb-0 rounded-0 border-bottom">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-1">Order #12290</h6>
+                                    <p class="text-muted small mb-0">March 23, 2025</p>
+                                </div>
+                                <div class="col-md-3 text-md-center my-2 my-md-0">
+                                    <span class="badge bg-success">Completed</span>
+                                </div>
+                                <div class="col-md-3 text-md-end">
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#orderDetails2">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="orderDetails2">
+                            <div class="card-body pt-0 pb-3 px-3 bg-light">
+                                <div class="row g-3">
+                                    <!-- Book 1 -->
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 80px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">Dune</h6>
+                                                <p class="text-muted small mb-1">By Frank Herbert</p>
+                                                <p class="small mb-0">Digital Edition • $9.99</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <hr class="my-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-bold">Total:</span>
+                                            <span class="fw-bold">$9.99</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="#" class="btn btn-sm btn-primary">Download Books</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order 3 -->
+                    <div class="card border-0 mb-0 rounded-0 border-bottom">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-1">Order #12115</h6>
+                                    <p class="text-muted small mb-0">February 10, 2025</p>
+                                </div>
+                                <div class="col-md-3 text-md-center my-2 my-md-0">
+                                    <span class="badge bg-success">Completed</span>
+                                </div>
+                                <div class="col-md-3 text-md-end">
+                                    <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#orderDetails3">
+                                        View Details
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse" id="orderDetails3">
+                            <div class="card-body pt-0 pb-3 px-3 bg-light">
+                                <div class="row g-3">
+                                    <!-- Book 1 -->
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 80px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">The Silent Patient</h6>
+                                                <p class="text-muted small mb-1">By Alex Michaelides</p>
+                                                <p class="small mb-0">Digital Edition • $11.99</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Book 2 -->
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 80px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">Where the Crawdads Sing</h6>
+                                                <p class="text-muted small mb-1">By Delia Owens</p>
+                                                <p class="small mb-0">Digital Edition • $13.99</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Book 3 -->
+                                    <div class="col-12">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0">
+                                                <div class="bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width: 60px; height: 80px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">Atomic Habits</h6>
+                                                <p class="text-muted small mb-1">By James Clear</p>
+                                                <p class="small mb-0">Digital Edition • $12.99</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <hr class="my-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="fw-bold">Total:</span>
+                                            <span class="fw-bold">$38.97</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="#" class="btn btn-sm btn-primary">Download Books</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center py-3">
+                    <nav aria-label="Order history pagination">
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Reading Stats -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Reading Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Books Purchased</h6>
+                                <h2 class="fw-bold">25</h2>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Reading Now</h6>
+                                <h2 class="fw-bold">3</h2>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Completed</h6>
+                                <h2 class="fw-bold">19</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recently Viewed Books -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Recently Viewed</h5>
+                    <a href="#" class="btn btn-sm btn-link text-decoration-none p-0">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-sm-6 col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body p-3 text-center">
+                                    <div class="bg-secondary bg-opacity-10 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 120px;">
+                                        <i class="bi bi-book" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <h6 class="mb-1">The Thursday Murder Club</h6>
+                                    <p class="text-muted small mb-0">Richard Osman</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body p-3 text-center">
+                                    <div class="bg-secondary bg-opacity-10 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 120px;">
+                                        <i class="bi bi-book" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <h6 class="mb-1">The Paris Apartment</h6>
+                                    <p class="text-muted small mb-0">Lucy Foley</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body p-3 text-center">
+                                    <div class="bg-secondary bg-opacity-10 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 120px;">
+                                        <i class="bi bi-book" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <h6 class="mb-1">Tomorrow, and Tomorrow...</h6>
+                                    <p class="text-muted small mb-0">Gabrielle Zevin</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

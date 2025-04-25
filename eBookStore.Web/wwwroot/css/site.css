@@ -376,6 +376,9 @@ media (max-width: 991.98px) {
 }
 
 
-.btn {
+.button, input, textarea {
     box-shadow:none !important;
 }
+
+
+
