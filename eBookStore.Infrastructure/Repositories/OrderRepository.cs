@@ -1,4 +1,4 @@
-﻿using eBookStore.Application.Common.Interfaces;
+﻿using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +14,14 @@ namespace eBookStore.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+            return await _dbContext.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Book)
+                .ToListAsync();
+        }
+
         public async Task<List<Order>> GetOrdersByUserIdAsync(string userId)
         {
             return await _dbContext.Orders
@@ -22,6 +30,12 @@ namespace eBookStore.Infrastructure.Repositories
                 .ThenInclude(oi => oi.Book)
                 .ToListAsync();
         }
-
+        public async Task<Order?> GetOrderById(int id)
+        {
+            return await _dbContext.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Book)
+                .FirstOrDefaultAsync(o => o.Id == id);
+        }
     }
 }

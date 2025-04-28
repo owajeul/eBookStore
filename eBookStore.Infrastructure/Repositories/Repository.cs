@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using eBookStore.Application.Common.Interfaces;
+using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

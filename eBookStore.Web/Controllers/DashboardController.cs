@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using eBookStore.Application.Common.Utilily;
-using eBookStore.Application.Services;
+using eBookStore.Application.Interfaces;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

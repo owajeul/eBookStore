@@ -1,28 +1,24 @@
-﻿using eBookStore.Application.Common.Interfaces;
-using eBookStore.Domain.Entities;
-using eBookStore.Infrastructure.Repositories;
+﻿using AutoMapper;
+using eBookStore.Application.DTOs;
+using eBookStore.Application.Interfaces;
+using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eBookStore.Web.Controllers;
 public class AdminBookController : Controller
 {
-    private readonly IBookRepository _bookRepository;
     private readonly IBookService _bookService;
+    private readonly IMapper _mapper;
 
-    public AdminBookController(IBookRepository bookRepository, IBookService bookService)
+    public AdminBookController(IBookRepository bookRepository, IBookService bookService, IMapper mapper)
     {
-        _bookRepository = bookRepository;
         _bookService = bookService;
-    }
-    public async Task<IActionResult> Index()
-    {
-        var books = await _bookRepository.GetAllAsync(b => b.Price > 12);
-        return View(books);
+        _mapper = mapper;
     }
 
     public async Task<IActionResult> Details(int id)
     {
-        var book = await _bookRepository.Get(b => b.Id == id);
+        var book = await _bookService.GetBookAsync(id);
         if (book == null)
         {
             return NotFound();
@@ -35,12 +31,12 @@ public class AdminBookController : Controller
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Book book)
+    public async Task<IActionResult> Create(BookVM book)
     {
         if (ModelState.IsValid)
         {
-            await _bookRepository.Add(book);
-            await _bookRepository.Save();
+            var bookDto = _mapper.Map<BookDto>(book);
+            await _bookService.AddNewBookAsync(bookDto);
             TempData["ToastrMessage"] = "Book created successfully.";
             TempData["ToastrType"] = "success";
             return RedirectToAction(nameof(Index));
@@ -49,7 +45,7 @@ public class AdminBookController : Controller
     }
     public async Task<IActionResult> Edit(int id)
     {
-        var book = await _bookRepository.Get(b => b.Id == id);
+        var book = await _bookService.GetBookAsync(id);
         if (book == null)
         {
             return NotFound();
@@ -58,12 +54,12 @@ public class AdminBookController : Controller
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(Book book)
+    public async Task<IActionResult> Edit(BookVM book)
     {
         if (ModelState.IsValid)
         {
-            _bookRepository.Update(book);
-            await _bookRepository.Save();
+            var bookDto = _mapper.Map<BookDto>(book);
+            await _bookService.UpdateBookAsync(bookDto);
             TempData["ToastrMessage"] = "Book updated successfully.";
             TempData["ToastrType"] = "success";
             return RedirectToAction(nameof(Index));
@@ -72,23 +68,16 @@ public class AdminBookController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> RestockBook(int id, int quantityToAdd)
+    public async Task<IActionResult> RestockBook(int id, int quantity)
     {
-        if (quantityToAdd <= 0)
+        if (quantity <= 0)
         {
             TempData["ToastrMessage"] = "Invalid quantity!";
             TempData["ToastrType"] = "error";
             return RedirectToAction("Index", "Dashboard");
         }
-        var book = await _bookRepository.Get(b => b.Id == id);
 
-        if (book == null)
-        {
-            return NotFound();
-        }
-        book.Stock += quantityToAdd;
-        _bookRepository.Update(book);
-        await _bookRepository.Save();
+        await _bookService.UpdateBookStockAsync(id, quantity);
 
         TempData["ToastrMessage"] = "Book restocked successfully.";
         TempData["ToastrType"] = "success";

@@ -1,4 +1,4 @@
-﻿using eBookStore.Application.Common.Interfaces;
+﻿using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;

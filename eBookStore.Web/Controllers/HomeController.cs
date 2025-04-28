@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using AutoMapper;
-using eBookStore.Application.Common.Dto;
-using eBookStore.Application.Common.Interfaces;
-using eBookStore.Domain.Entities;
+using eBookStore.Application.Interfaces;
 using eBookStore.Web.Models;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;

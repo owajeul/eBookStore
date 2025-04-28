@@ -1,4 +1,4 @@
-﻿using eBookStore.Application.Common.Dto;
+﻿using eBookStore.Application.DTOs;
 
 namespace eBookStore.Web.ViewModels
 {
