@@ -54,7 +54,7 @@ namespace eBookStore.Web.Controllers
 
                     var user = await _userManager.FindByEmailAsync(loginVM.Email);
                     
-                    await MergeCartOnLogin();
+                    await MergeCartOnOrRegisterLogin();
                     return RedirectUser(loginVM.RedirectUrl);
                 }
                 _logger.LogWarning("Failed login attempt for {Email}.", loginVM.Email);
@@ -87,7 +87,7 @@ namespace eBookStore.Web.Controllers
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     TempData["ToastrMessage"] = "Registration successful. Welcome!";
                     TempData["ToastrType"] = "success";
-
+                    await MergeCartOnOrRegisterLogin();
                     return RedirectUser(registerVM.RedirectUrl);
                 }
 
@@ -128,14 +128,15 @@ namespace eBookStore.Web.Controllers
         }
 
 
-        private async Task MergeCartOnLogin()
+        private async Task MergeCartOnOrRegisterLogin()
         {
             var userId = _userManager.GetUserId(User);
             var sessionCart = GetSessionCart();
             var dbCart =await _cartService.GetUserCartAsync(userId);
+            var sessionCartDto = _mapper.Map<CartDto>(sessionCart);
             await _cartService.MergeSessionCartWithDbCartAsync(
                 userId, 
-                _mapper.Map<CartDto>(sessionCart), 
+                sessionCartDto,
                 dbCart
             );
 
