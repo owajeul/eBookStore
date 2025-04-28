@@ -375,10 +375,35 @@ media (max-width: 991.98px) {
 }
 }
 
-
 .button, input, textarea {
     box-shadow:none !important;
 }
 
 
+/*Status Badges */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
 
+.status-processing {
+    background-color: rgba(52, 152, 219, 0.15);
+    color: #3498db;
+}
+
+.status-shipped {
+    background-color: rgba(230, 126, 34, 0.15);
+    color: #e67e22;
+}
+
+.status-delivered {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+}
+
+.status-cancelled {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+}

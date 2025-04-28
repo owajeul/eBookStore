@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using eBookStore.Application.Common.Interfaces;
+using eBookStore.Application.Interfaces;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,2 +1,5 @@
 ﻿@model List<TopSellingBookVM>
+@{
+    Layout = "_AdminLayout";
+}
 @await Component.InvokeAsync("TopSellingBooks", Model)

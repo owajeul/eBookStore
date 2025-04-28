@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using eBookStore.Application.Common.Interfaces;
 using eBookStore.Application.Common.Utilily;
-using eBookStore.Domain.Entities;
+using eBookStore.Application.DTOs;
+using eBookStore.Application.Interfaces;
 using eBookStore.Infrastructure.Data.Identity;
-using eBookStore.Infrastructure.Services;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,20 +16,20 @@ namespace eBookStore.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
         private readonly ICartService _cartService;
-        private readonly IAccountService _accountService;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public AccountController(
             ILogger<AccountController> logger,
             ICartService cartService,
-            IAccountService accountService,
+            IUserService userService,
             IMapper mapper,
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _cartService = cartService;
-            _accountService = accountService;
+            _userService = userService;
             _mapper = mapper;
             _signInManager = signInManager;
             _userManager = userManager;
@@ -54,10 +53,7 @@ namespace eBookStore.Web.Controllers
                     TempData["ToastrType"] = "success";
 
                     var user = await _userManager.FindByEmailAsync(loginVM.Email);
-                    if(await _userManager.IsInRoleAsync(user, AppConstant.Role_Admin))
-                    {
-                        return RedirectToAction("Index", "Dashboard");
-                    }
+                    
                     await MergeCartOnLogin();
                     return RedirectUser(loginVM.RedirectUrl);
                 }
@@ -136,53 +132,22 @@ namespace eBookStore.Web.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var sessionCart = GetSessionCart();
-            var dbCart = await GetUserCartFromDatabase(userId);
-            if (sessionCart == null) return;
+            var dbCart =await _cartService.GetUserCartAsync(userId);
+            await _cartService.MergeSessionCartWithDbCartAsync(
+                userId, 
+                _mapper.Map<CartDto>(sessionCart), 
+                dbCart
+            );
 
-            await MergeCartsAsync(userId, sessionCart, dbCart);
             ClearSessionCart();
         }
-        private Cart? GetSessionCart()
+        private CartVM? GetSessionCart()
         {
             var sessionCartJson = HttpContext.Session.GetString("Cart");
             if(string.IsNullOrEmpty(sessionCartJson)) return null;
-            return JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+            return JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
         }
-        private async Task<Cart> GetUserCartFromDatabase(string userId)
-        {
-            return await _cartService.GetUserCartAsync(userId);
-        }
-        private async Task MergeCartsAsync(string userId, Cart sessionCart, Cart? dbCart)
-        {
-            if (dbCart == null)
-            {
-                CreateNewCartFromSession(userId, sessionCart);
-            }
-            else
-            {
-                await MergeSessionCartItemsIntoDbCartAsync(userId, dbCart.Id, sessionCart);
-            }
-        }
-        private void CreateNewCartFromSession(string userId, Cart sessionCart)
-        {
-            sessionCart.UserId = userId;
-            sessionCart.CreatedAt = DateTime.UtcNow;
-            _cartService.UpdateCart(sessionCart);
-        }
-        private async Task MergeSessionCartItemsIntoDbCartAsync(string userId, int dbCartId, Cart sessionCart)
-        {
-           foreach(var item in sessionCart.CartItems)
-            {
-                if (await _cartService.IsBookInCartAsync(userId, item.BookId))
-                {
-                    await _cartService.AddQuantityAsync(dbCartId, item.BookId, item.Quantity);
-                }
-                else
-                {
-                    await _cartService.AddToCartAsync(userId, item.BookId, item.Quantity);
-                }
-            }
-        }
+
         private void ClearSessionCart()
         {
             HttpContext.Session.Remove("Cart");
@@ -190,7 +155,7 @@ namespace eBookStore.Web.Controllers
 
         public async Task<IActionResult> Profile()
         {
-            var userProfileData = await _accountService.GetUserProfileDataAsync(_userManager.GetUserId(User));
+            var userProfileData = await _userService.GetUserProfileDataAsync();
             return View(_mapper.Map<ProfileVM>(userProfileData));
         }
     }

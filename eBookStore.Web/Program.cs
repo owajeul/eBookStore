@@ -1,4 +1,4 @@
-using eBookStore.Application.Common.Interfaces;
+using eBookStore.Application.Interfaces;
 using eBookStore.Application.Services;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Data.Identity;
@@ -29,13 +29,13 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<DbInitializer>();
 
 builder.Services.AddAutoMapper( 
     typeof(PresentationMappingProfile),
-    typeof(InfrastructureMappingProfile)
+    typeof(ApplicationMappingProfile)
 );
 
 builder.Services.Configure<IdentityOptions>(options =>

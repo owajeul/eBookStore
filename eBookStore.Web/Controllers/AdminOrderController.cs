@@ -1,6 +1,6 @@
-﻿using eBookStore.Application.Common.Utilily;
-using eBookStore.Domain.Entities;
-using eBookStore.Infrastructure.Data;
+﻿using AutoMapper;
+using eBookStore.Application.Common.Utilily;
+using eBookStore.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,45 +8,35 @@ namespace eBookStore.Web.Controllers
 {
     public class AdminOrderController : Controller
     {
-        private readonly AppDbContext _dbContext;
+        private readonly IOrderService _orderService;
+        private readonly IMapper _mapper;
 
-        public AdminOrderController(AppDbContext dbContext)
+        public AdminOrderController(IOrderService orderService, IMapper mapper)
         {
-            _dbContext = dbContext;
+            _orderService = orderService;
+            _mapper = mapper;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var customerOrders = _dbContext.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Book)
-                .ToList();
+            var customerOrders = await _orderService.GetAllOrdersAsync();
             return View(customerOrders);
         }
         public IActionResult Details(int id)
         {
-            var order = _dbContext.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Book)
-                .FirstOrDefault(o => o.Id == id);
+            var order = _orderService.GetOrderById(id);
             return View(order);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Update(int orderId, string orderStatus)
+        public async Task<IActionResult> Update(int orderId, string orderStatus)
         {
-            var order = _dbContext.Orders.FirstOrDefault(o => o.Id == orderId);
-            if (order == null)
-            {
-                return NotFound();
-            }
             if(!AppConstant.ValidStatuses.Contains(orderStatus))
             {
                 TempData["TostrMessage"] = "Invalid status!";
                 TempData["TostrType"] = "error";
                 return RedirectToAction("Details", new {id = orderId});
             }
-            order.Status = orderStatus;
-            _dbContext.SaveChanges();
+            await _orderService.ChangeOrderStatus(orderId, orderStatus);
             return RedirectToAction("Index");
         }
     }

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using eBookStore.Application.Common.Dto;
-using eBookStore.Application.Common.Interfaces;
 using eBookStore.Application.Common.Utilily;
+using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Models;

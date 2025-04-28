@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using eBookStore.Application.Common.Interfaces;
-using eBookStore.Domain.Entities;
-using eBookStore.Infrastructure.Data;
-using eBookStore.Infrastructure.Data.Identity;
-using eBookStore.Infrastructure.Services;
+﻿using AutoMapper;
+using eBookStore.Application.DTOs;
+using eBookStore.Application.Interfaces;
+using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,22 +13,29 @@ namespace eBookStore.Web.Controllers;
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserService _userService;
     private readonly IBookService _bookService;
+    private readonly IMapper _mapper;
 
-    public CartController(ICartService cartService, UserManager<ApplicationUser> userManager, IBookService bookService)
+    public CartController(ICartService cartService, 
+        IUserService userService, 
+        IBookService bookService,
+        IMapper mapper
+        )
     {
         _cartService = cartService;
-        _userManager = userManager;
+        _userService = userService;
         _bookService = bookService;
+        _mapper = mapper;
     }
     public async Task<IActionResult> Index()
     {
-        Cart cart = new Cart();
+        var cart = new CartVM();
 
         if (User.Identity.IsAuthenticated)
         {
-            cart = await _cartService.GetUserCartWithItemsAsync(_userManager.GetUserId(User));
+            var cartDto = await _cartService.GetUserCartWithItemsAsync(_userService.GetUserId());
+            cart = _mapper.Map<CartVM>(cartDto);
         }
         else
         {
@@ -38,7 +43,7 @@ public class CartController : Controller
 
             if (!string.IsNullOrEmpty(sessionCartJson))
             {
-                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+                cart = JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
             }
         }
 
@@ -64,7 +69,7 @@ public class CartController : Controller
 
         if (User.Identity.IsAuthenticated)
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = _userService.GetUserId();
             if (await _cartService.IsBookInCartAsync(userId, bookId))
             {
                 return Ok(new {message = "Book already in cart!" , status = "warning"});
@@ -78,10 +83,10 @@ public class CartController : Controller
         else
         {
             var sessionCartJson = HttpContext.Session.GetString("Cart");
-            var cart = new Cart();
+            var cart = new CartVM();
             if (!string.IsNullOrEmpty(sessionCartJson))
             {
-                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+                cart = JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
             }
 
             var bookExistInCart = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
@@ -92,8 +97,9 @@ public class CartController : Controller
             }
             else
             {
-                var book = await _bookService.GetBookAsync(bookId);
-                cart.CartItems.Add(new CartItem
+                var bookDto = await _bookService.GetBookAsync(bookId);
+                var book = _mapper.Map<BookVM>(bookDto);
+                cart.CartItems.Add(new CartItemVM
                 {
                     BookId = book.Id,
                     Book = book,
@@ -115,10 +121,10 @@ public class CartController : Controller
         else
         {
             var sessionCartJson = HttpContext.Session.GetString("Cart");
-            var cart = new Cart();
+            var cart = new CartVM();
             if (!string.IsNullOrEmpty(sessionCartJson))
             {
-                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+                cart = JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
             }
 
             var cartItem = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
@@ -137,10 +143,10 @@ public class CartController : Controller
         else
         {
             var sessionCartJson = HttpContext.Session.GetString("Cart");
-            var cart = new Cart();
+            var cart = new CartVM();
             if (!string.IsNullOrEmpty(sessionCartJson))
             {
-                cart = JsonConvert.DeserializeObject<Cart>(sessionCartJson);
+                cart = JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
             }
 
             var cartItem = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
@@ -158,7 +164,7 @@ public class CartController : Controller
 
     public async Task<IActionResult> DeleteCartItem(int cartId, int bookId)
     {
-        var userId = _userManager.GetUserId(User);
+        var userId = _userService.GetUserId();
         await _cartService.RemoveFromCartAsync(cartId, bookId);
         return Ok();
     }
