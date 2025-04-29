@@ -16,11 +16,13 @@ public class BookService : IBookService
 {
     private readonly IBookRepository _bookRepository;
     private readonly IMapper _mapper;
+    private readonly IUserService _userService;
 
-    public BookService(IBookRepository bookRepository, IMapper mapper)
+    public BookService(IBookRepository bookRepository, IMapper mapper, IUserService userService)
     {
         _bookRepository = bookRepository;
         _mapper = mapper;
+        _userService = userService;
     }
 
     public async Task<List<BookDto>> GetAllBooksAsync()
@@ -158,6 +160,24 @@ public class BookService : IBookService
             throw new BookServiceException($"Failed to update book with ID {bookDto?.Id}", ex);
         }
     }
+
+    public async Task<bool> HasUserPurchasedBookAsync(int bookId)
+    {
+        return await _bookRepository.HasUserPurchasedBookAsync(bookId, _userService.GetUserId());
+    }
+    public async Task ReviewBookAsync(int bookId, int rating, string comment)
+    {
+        try
+        {
+           await AddBookReviewOfUserAsync(bookId, rating, comment);
+           await _bookRepository.Save();
+        }
+        catch(Exception ex) when (!(ex is BookServiceException))
+        {
+            throw new BookServiceException($"Failed to review book with ID {bookId}", ex);
+        }
+    }   
+
     private async Task<List<BookDto>> FetchAllBooksAsync()
     {
         var books = await _bookRepository.GetAllAsync();
@@ -294,6 +314,39 @@ public class BookService : IBookService
 
         if (bookDto.Price < 0)
             throw new ArgumentException("Book price cannot be negative", nameof(bookDto.Price));
+    }
+
+    private async Task AddBookReviewOfUserAsync(int bookId, int rating, string comment)
+    {
+        if(bookId <= 0)
+        {
+            throw new ArgumentException("Book ID must be greater than zero");
+        }
+        if (rating < 1 || rating > 5)
+        {
+            throw new ArgumentException("Rating must be between 1 and 5");
+        }
+        if (string.IsNullOrEmpty(comment))
+        {
+            throw new ArgumentException("Comment cannot be empty");
+        }
+        var user = await _userService.GetUserAsync();
+        var review = await _bookRepository.GetBookReviewAsync(bookId, user.UserId);
+        if (review != null)
+        {
+            throw new BookServiceException($"User {user.UserId} has not already reviewed the book");
+        }
+        var bookReview = new BookReview
+        {
+            BookId = bookId,
+            UserId = user.UserId,
+            UserName = user.Name,
+            Rating = rating,
+            Comment = comment ?? string.Empty,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _bookRepository.AddBookReviewAsync(bookReview);
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eBookStore.Application.Interfaces;
 using eBookStore.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace eBookStore.Web.Controllers;
 
@@ -19,5 +20,17 @@ public class BookController : Controller
         var bookDto = await _bookService.GetBookAsync(id);
         var bookViewModel = _mapper.Map<BookVM>(bookDto);
         return View(bookViewModel);
+    }
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> AddReview(int bookId, int rating, string comment)
+    {
+       var userPurchasedTheBook = await _bookService.HasUserPurchasedBookAsync(bookId);
+        if (!userPurchasedTheBook)
+        {
+            return BadRequest("You must purchase the book before reviewing it.");
+        }
+       await _bookService.ReviewBookAsync(bookId, rating, comment);
+       return Ok(new { message = "Review added successfully", status = "success" });
     }
 }

@@ -13,4 +13,6 @@ public interface IBookService
     Task UpdateBookStockAsync(int id, int stock);
     Task AddNewBookAsync(BookDto bookDto);
     Task UpdateBookAsync(BookDto bookDto);
+    Task<bool> HasUserPurchasedBookAsync(int bookId);
+    Task ReviewBookAsync(int bookId, int rating, string comment);
 }

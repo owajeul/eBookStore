@@ -15,19 +15,19 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly ICartRepository _cartRepository;
-    private readonly IBookService _bookService;
+    private readonly IBookRepository _bookRepository;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
     public OrderService(IOrderRepository orderRepository,
         ICartRepository cartRepository, 
-        IBookService bookService,
+        IBookRepository bookRepository,
         IMapper mapper,
         IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
-        _bookService = bookService;
+        _bookRepository = bookRepository;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
     }
@@ -53,8 +53,8 @@ public class OrderService : IOrderService
     {
         foreach (var item in orderDto.OrderItems)
         {
-            var book = await _bookService.GetBookAsync(item.BookId);
-            if(book.Stock < item.Quantity)
+            var book = await _bookRepository.Get(b => b.Id == item.BookId);
+            if (book.Stock < item.Quantity)
                 throw new OrderServiceException($"Not enough stock for book id: {book.Id} title:{book.Title}");
         }
     }

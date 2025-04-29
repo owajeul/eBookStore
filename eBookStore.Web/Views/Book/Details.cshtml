@@ -227,39 +227,7 @@
                     </div>
 
                     <!-- Add Review Form -->
-                    <div class="collapse mb-5" id="addReviewForm">
-                        <div class="card border-0 bg-light rounded-4 p-4">
-                            <div class="card-body">
-                                <h5 class="fw-bold mb-3">Write Your Review</h5>
-                                <form method="post">
-                                    <input type="hidden" name="bookId" value="@Model.Id" />
-
-                                    <div class="mb-3">
-                                        <label for="rating" class="form-label">Your Rating <span class="text-danger">*</span></label>
-                                        <div class="d-flex align-items-center">
-                                            <select class="form-select" id="rating" name="rating" required style="max-width: 200px">
-                                                <option value="5">5 - Excellent</option>
-                                                <option value="4">4 - Good</option>
-                                                <option value="3">3 - Average</option>
-                                                <option value="2">2 - Poor</option>
-                                                <option value="1">1 - Terrible</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="comment" class="form-label">Your Review <span class="text-danger">*</span></label>
-                                        <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Share your thoughts about this book..." required></textarea>
-                                    </div>
-
-                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#addReviewForm">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Submit Review</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    @await Html.PartialAsync("_AddReviewPartial", Model.Id)
 
                     <!-- Review List -->
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -330,5 +298,43 @@
                 }
             });
         });
+
+        $("#addReviewForm form").submit(function (e) {
+            e.preventDefault();
+            submitReview();
+        });
+
+        function submitReview() {
+            const bookId = @Model.Id;
+            const rating = $("#rating").val();
+            const comment = $("#comment").val();
+
+
+            $.ajax({
+                url: "/Book/AddReview",
+                type: "POST",
+                data: { bookId: bookId, rating: rating, comment: comment },
+                success: function (response) {
+                    toastr["success"](response.message);
+                },
+                error: function () {
+                    toastr.error("An error occurred. Please try again later.");
+                }
+            });
+            resetReviewForm();
+        }
+
+        function resetReviewForm() {
+            const form = $("#addReviewForm form");
+            if (form.length > 0) {
+                form[0].reset();
+                form.attr("data-action", "create");
+                form.removeAttr("data-id");
+            } else {
+                console.log("Form not found!");
+            }
+        }
+
+
     </script>
 }
