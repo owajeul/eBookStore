@@ -15,4 +15,6 @@ public interface IBookService
     Task UpdateBookAsync(BookDto bookDto);
     Task<bool> HasUserPurchasedBookAsync(int bookId);
     Task ReviewBookAsync(int bookId, int rating, string comment);
+    Task<BookWithReviewsDto> GetBookWithReviewsAsync(int bookId);
+    Task<BookReviewDto> GetBookReviewOfCurrentUserAsync(int bookId);
 }

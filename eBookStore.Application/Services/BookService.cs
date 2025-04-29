@@ -80,6 +80,34 @@ public class BookService : IBookService
         }
     }
 
+    public async Task<BookReviewDto> GetBookReviewOfCurrentUserAsync(int bookId)
+    {
+        try
+        {
+            if (bookId <= 0)
+                throw new ArgumentException("Book ID must be greater than zero", nameof(bookId));
+            var bookReview = await _bookRepository.GetBookReviewAsync(bookId, _userService.GetUserId());
+            if (bookReview == null)
+                throw new BookNotFoundException($"No review found for book with ID {bookId}");
+            return _mapper.Map<BookReviewDto>(bookReview);
+        }
+        catch (Exception ex) when (!(ex is BookServiceException))
+        {
+            throw new BookServiceException($"Failed to retrieve review for book with ID {bookId}", ex);
+        }
+    }
+
+    public async Task<BookWithReviewsDto> GetBookWithReviewsAsync(int bookId)
+    {
+        try
+        {
+           return await FetchBookWithReviewsAsync(bookId);
+        }
+        catch (Exception ex) when (!(ex is BookServiceException))
+        {
+            throw new BookServiceException($"Failed to retrieve book with ID {bookId}", ex);
+        }
+    }
     public async Task<List<BookDto>> GetFilteredBooksAsync(BookFilterDto filter)
     {
         try
@@ -347,6 +375,21 @@ public class BookService : IBookService
         };
 
         await _bookRepository.AddBookReviewAsync(bookReview);
+    }
+
+    private async Task<BookWithReviewsDto> FetchBookWithReviewsAsync(int bookId)
+    {
+        if (bookId <= 0)
+            throw new ArgumentException("Book ID must be greater than zero", nameof(bookId));
+        var book = await _bookRepository.GetBookWithReviewsAsync(bookId);
+        if (book == null)
+            throw new BookNotFoundException($"Book with ID {bookId} not found");
+        var bookDto = _mapper.Map<BookWithReviewsDto>(book);
+        double averageRating = book.Reviews.Any() ? book.Reviews.Average(r => r.Rating): 0;
+        int totalReviews = book.Reviews.Count;
+        bookDto.AverageRating = averageRating;
+        bookDto.ReviewCount = totalReviews;
+        return bookDto;
     }
 
 }

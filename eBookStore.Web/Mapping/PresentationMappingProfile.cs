@@ -26,6 +26,9 @@ namespace eBookStore.Web.Mapping
             CreateMap<OrderVM, OrderVM>();
             CreateMap<OrderItemDto, OrderItemVM>();
             CreateMap<OrderItemVM, OrderItemDto>();
+            CreateMap<BookWithReviewsDto, BookWithReviewsVM>();
+            CreateMap<BookReviewDto, BookReviewVM>();
+
         }
     }
 }

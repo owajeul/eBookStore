@@ -23,6 +23,7 @@ public class BookRepository : Repository<Book>, IBookRepository
         var book = await _dbContext.Books.FindAsync(bookId);
         return book.Price;
     }
+
     public async Task AddBookReviewAsync(BookReview bookReview)
     {
         await _dbContext.BookReviews.AddAsync(bookReview);
@@ -38,4 +39,12 @@ public class BookRepository : Repository<Book>, IBookRepository
             .Include(o => o.OrderItems)
                       .AnyAsync(o => o.UserId == userId && o.OrderItems.Any(oi => oi.BookId == bookId));
     }
+
+    public async Task<Book?> GetBookWithReviewsAsync(int bookId)
+    {
+        return await _dbContext.Books
+            .Include(b => b.Reviews)
+            .FirstOrDefaultAsync(b => b.Id == bookId);
+    }
+
 }

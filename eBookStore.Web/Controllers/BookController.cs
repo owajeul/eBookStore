@@ -17,8 +17,8 @@ public class BookController : Controller
     }
     public async Task<IActionResult> Details(int id)
     {
-        var bookDto = await _bookService.GetBookAsync(id);
-        var bookViewModel = _mapper.Map<BookVM>(bookDto);
+        var bookDto = await _bookService.GetBookWithReviewsAsync(id);
+        var bookViewModel = _mapper.Map<BookWithReviewsVM>(bookDto);
         return View(bookViewModel);
     }
     [Authorize]
@@ -31,6 +31,7 @@ public class BookController : Controller
             return BadRequest("You must purchase the book before reviewing it.");
         }
        await _bookService.ReviewBookAsync(bookId, rating, comment);
-       return Ok(new { message = "Review added successfully", status = "success" });
+        var review = await _bookService.GetBookReviewOfCurrentUserAsync(bookId);
+       return Ok(review);
     }
 }

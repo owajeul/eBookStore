@@ -25,6 +25,8 @@ namespace eBookStore.Infrastructure.Mapping
             CreateMap<CartDto, Cart>();
             CreateMap<CartItem, CartItemDto>();
             CreateMap<CartItemDto, CartItem>();
+            CreateMap<BookReview, BookReviewDto>();
+            CreateMap<Book, BookWithReviewsDto>();
         }
     }
 }
