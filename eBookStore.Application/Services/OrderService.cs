@@ -15,13 +15,21 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly ICartRepository _cartRepository;
+    private readonly IBookService _bookService;
     private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository, IMapper mapper)
+    public OrderService(IOrderRepository orderRepository,
+        ICartRepository cartRepository, 
+        IBookService bookService,
+        IMapper mapper,
+        IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
+        _bookService = bookService;
         _mapper = mapper;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task PlaceOrderAsync(OrderDto orderDto)
@@ -29,11 +37,25 @@ public class OrderService : IOrderService
         try
         {
             ValidateOrderDto(orderDto);
+            await _unitOfWork.BeginTransactionAsync();
+            await CheckStockAsync(orderDto);
             await CreateOrderAsync(orderDto);
+            await _unitOfWork.CommitTransactionAsync();
         }
         catch (Exception ex) when (!(ex is OrderServiceException))
         {
+            await _unitOfWork.RollbackTransactionAsync();
             throw new OrderServiceException($"Failed to place order for user {orderDto?.UserId}", ex);
+        }
+    }
+
+    public async Task CheckStockAsync(OrderDto orderDto)
+    {
+        foreach (var item in orderDto.OrderItems)
+        {
+            var book = await _bookService.GetBookAsync(item.BookId);
+            if(book.Stock < item.Quantity)
+                throw new OrderServiceException($"Not enough stock for book id: {book.Id} title:{book.Title}");
         }
     }
 
