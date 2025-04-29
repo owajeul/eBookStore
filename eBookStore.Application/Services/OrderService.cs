@@ -171,7 +171,7 @@ public class OrderService : IOrderService
 
     private async Task<List<OrderDto>> FetchAllOrdersAsync()
     {
-        var orders = _orderRepository.GetAllOrdersAsync();
+        var orders = await _orderRepository.GetAllOrdersAsync();
 
         if (orders == null)
             return new List<OrderDto>();

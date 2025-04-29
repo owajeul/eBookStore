@@ -318,9 +318,17 @@ namespace eBookStore.Application.Services;
 
         private async Task MergeCartsAsync(string userId, CartDto sessionCart, CartDto? dbCart)
         {
+            
             foreach(var item in sessionCart.CartItems)
             {
-                await AddBookToCartAsync(userId, item.BookId, item.Quantity);
+                if(dbCart == null)
+                {
+                    await AddBookToCartAsync(userId, item.BookId, item.Quantity);
+                }
+                else
+                {
+                    await AddToCartItemQuantityAsync(dbCart.Id, item.BookId, item.Quantity);
+                }
             }
         }
 

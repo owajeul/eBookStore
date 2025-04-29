@@ -19,11 +19,8 @@ public class AdminBookController : Controller
     public async Task<IActionResult> Details(int id)
     {
         var book = await _bookService.GetBookAsync(id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-        return View(book);
+        var bookViewModel = _mapper.Map<BookVM>(book);
+        return View(bookViewModel);
     }
     public IActionResult Create()
     {
@@ -46,11 +43,8 @@ public class AdminBookController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var book = await _bookService.GetBookAsync(id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-        return View(book);
+        var bookViewModel = _mapper.Map<BookVM>(book);  
+        return View(bookViewModel);
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -88,10 +82,6 @@ public class AdminBookController : Controller
     [HttpPost]
     public async Task<IActionResult> UpdateBookStock(int id, int stock)
     {
-        if(stock < 0)
-        {
-            return BadRequest("Stock cannot be negative.");
-        }
         await _bookService.UpdateBookStockAsync(id, stock);
         return Ok(new {message = "Stock updated successfully", status = "success"});
     }
