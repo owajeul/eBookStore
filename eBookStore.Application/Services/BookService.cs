@@ -103,6 +103,10 @@ public class BookService : IBookService
         {
            return await FetchBookWithReviewsAsync(bookId);
         }
+        catch(BookNotFoundException)
+        {
+            throw;
+        }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
             throw new BookServiceException($"Failed to retrieve book with ID {bookId}", ex);
