@@ -52,11 +52,11 @@ public class AdminBookController : Controller
     {
         if (ModelState.IsValid)
         {
-            var bookDto = _mapper.Map<BookDto>(book);
+            var bookDto = _mapper.Map<BookWithDescriptionDto>(book);
             await _bookService.UpdateBookAsync(bookDto);
             TempData["ToastrMessage"] = "Book updated successfully.";
             TempData["ToastrType"] = "success";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Book", new {id = book.Id});
         }
         return View(book);
     }

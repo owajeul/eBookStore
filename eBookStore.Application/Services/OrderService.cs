@@ -122,7 +122,7 @@ public class OrderService : IOrderService
 
     private void ValidateOrderStatus(string status)
     {
-        if ( AppConstant.ValidStatuses.Contains(status))
+        if (!AppConstant.ValidStatuses.Contains(status))
             throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", AppConstant.ValidStatuses)}", nameof(status));
     }
 
@@ -203,7 +203,7 @@ public class OrderService : IOrderService
 
     private async Task<OrderDto> FetchOrderByIdAsync(int id)
     {
-        var order = await _orderRepository.Get(o => o.Id == id);
+        var order = await _orderRepository.GetOrderById(id);
 
         if (order == null)
             throw new OrderNotFoundException($"Order with ID {id} not found");

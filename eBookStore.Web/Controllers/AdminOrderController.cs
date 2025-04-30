@@ -23,9 +23,9 @@ namespace eBookStore.Web.Controllers
             var orderViewModel = _mapper.Map<List<OrderVM>>(customerOrders);
             return View(orderViewModel);
         }
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var order = _orderService.GetOrderById(id);
+            var order = await _orderService.GetOrderById(id);
             var orderViewModel = _mapper.Map<OrderVM>(order);
             return View(orderViewModel);
         }

@@ -1,8 +1,6 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
 }
-
 <div class="container content-wrapper">
     <div class="row">
         <!-- Filter Column -->
@@ -76,15 +74,20 @@
             </div>
 
             <div class="row g-4" id="bookList">
-                
             </div>
         </div>
     </div>
+     <div class="row justify-content-center">
+        <div class="col" id="pagination-container"></div>
+     </div>
 </div>
 
+
 @section Scripts {
-    
-    <script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css">
+    <script>
+
             $(document).ready(function () {
             const $bookList = $('#bookList');
             const $genreSelect = $('#genre');
@@ -131,7 +134,7 @@
 
                 $.each(books, function (i, book) {
                     const bookCard = `
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-4 book-card-container">
                         <div class="book-card">
                             <div class="book-img-container">
                                 <img src="${book.imageUrl}" class="book-img" alt="${book.title}">
@@ -178,7 +181,7 @@
                 e.preventDefault();
                 $genreSelect.val('');
                 $priceRange.val('100');
-                $priceValue.text('$100'); 
+                $priceValue.text('$100');
                 $('input[name="sortBy"][value="@AppConstant.SortByPriceAsc"]').prop('checked', true);
 
                 loadBooks();
@@ -189,7 +192,7 @@
             });
 
 
-            
+
 
             const HOMEPAGE_KEY = 'homepagedata';
             const MAX_DURATION_MINUTES = 10;
@@ -224,6 +227,7 @@
             function loadBooks() {
                 const filteredBooks = applyFilter(allBooks);
                 renderBooks(filteredBooks);
+                loadPagination();
             }
 
             function loadHomepage() {
@@ -236,6 +240,9 @@
 
                     const filteredBooks = applyFilter(savedData.books);
                     renderBooks(filteredBooks);
+                    setTimeout(function() {
+                        loadPagination();
+                    }, 1000);
                 } else {
                     fetchDataFromAPI();
                     console.log("Data loaded from API");
@@ -243,11 +250,29 @@
 
             }
 
+            function loadPagination() {
+              $('.book-card-container').hide();
+              var items = $(".book-card-container");
+                  var numItems = items.length;
+                  var perPage = 27;
+                  items.slice(0, perPage).show();
+
+                  $("#pagination-container").pagination({
+                    items: numItems,
+                    itemsOnPage: perPage,
+                    cssStyle: 'light-theme',
+                    onPageClick: function (pageNumber) {
+                      var showFrom = (pageNumber - 1) * perPage;
+                      var showTo = showFrom + perPage;
+                      items.hide().slice(showFrom, showTo).show();
+                    }
+                  });
+            }
+
             loadHomepage();
         });
-        
+
 
     </script>
-
 
 }

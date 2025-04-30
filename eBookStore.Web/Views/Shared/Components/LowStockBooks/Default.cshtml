@@ -28,7 +28,7 @@
                                     <td>
                                         <form asp-action="RestockBook" asp-controller="AdminBook" method="post" class="d-flex" style="gap: 0.5rem;">
                                             <input type="hidden" name="id" value="@book.Id" />
-                                            <input type="number" name="quantityToAdd" min="1" placeholder="Qty" class="form-control form-control-sm w-25" required />
+                                            <input type="number" name="quantity" min="1" placeholder="Qty" class="form-control form-control-sm w-25" required />
                                             <button type="submit" class="btn btn-sm btn-outline-primary">Restock</button>
                                         </form>
                                     </td>
