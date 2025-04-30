@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
+using eBookStore.Infrastructure.Repositories;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,12 @@ public class AdminBookController : Controller
         _bookService = bookService;
         _mapper = mapper;
     }
-
+    public async Task<IActionResult> Index()
+    {
+        var books = await _bookService.GetAllBooksAsync();
+        var booksViewModel = _mapper.Map<List<BookVM>>(books);
+        return View(booksViewModel);
+    }
     public async Task<IActionResult> Details(int id)
     {
         var book = await _bookService.GetBookAsync(id);
