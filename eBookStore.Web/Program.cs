@@ -66,18 +66,15 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-})
-.AddCookie()
-.AddGoogle(options =>
-{
-    options.ClientId = builder.Configuration["GoogleAuth:ClientId"];
-    options.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"];
-    options.SaveTokens = true;
-});
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["GoogleAuth:ClientId"];
+        options.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"];
+        options.SaveTokens = true;
+    });
+
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -105,6 +102,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 SeedDatabase();

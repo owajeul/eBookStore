@@ -1,9 +1,12 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
 using eBookStore.Infrastructure.Data.Identity;
 using eBookStore.Web.ViewModels;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -118,6 +121,53 @@ namespace eBookStore.Web.Controllers
             TempData["ToastrMessage"] = $"Goodbye, {userName}. You have been logged out.";
             TempData["ToastrType"] = "success";
             return RedirectToAction("Index", "Home");
+        }
+
+
+        public async Task GoogleLogin(string returnUrl = "/")
+        {
+            var redirectUrl = Url.Action("GoogleResponse", new { returnUrl });
+
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+
+            await HttpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, properties);
+        }
+
+        public async Task<IActionResult> GoogleResponse(string returnUrl = "/")
+        {
+            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            if (result?.Principal != null)
+            {
+                var email = result.Principal.FindFirstValue(ClaimTypes.Email);
+                var name = result.Principal.FindFirstValue(ClaimTypes.Name);
+
+                var existingUser = await _userManager.FindByEmailAsync(email);
+
+                if (existingUser == null)
+                {
+                    var newUser = new ApplicationUser { UserName = email, Email = email, Name = name };
+
+                    var createResult = await _userManager.CreateAsync(newUser);
+
+                    if (createResult.Succeeded)
+                    {
+                        await _signInManager.SignInAsync(newUser, isPersistent: false);
+                    }
+                    else
+                    {
+                        return BadRequest("User registration failed.");
+                    }
+                }
+                else
+                {
+                    await _signInManager.SignInAsync(existingUser, isPersistent: false);
+                }
+                await MergeCartOnOrRegisterLogin();
+                return LocalRedirect(returnUrl);
+            }
+
+            return BadRequest("Authentication failed.");
         }
 
 

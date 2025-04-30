@@ -13,7 +13,7 @@
     <!-- Sidebar -->
     <nav class="admin-sidebar">
         <div class="sidebar-brand">
-            <h2><i class="bi bi-book"></i> Bookstore Admin</h2>
+            <h2><i class="bi bi-book"></i> Admin Panel</h2>
         </div>
 
         <ul class="nav flex-column">
@@ -51,10 +51,15 @@
             <i class="bi bi-list"></i>
         </button>
 
+        <div>
+            
+        </div>
         <div class="d-none d-md-block">
             <h5 class="mb-0 text-dark">@ViewData["Title"]</h5>
         </div>
-
+        <div>
+            <a class="nav-link" asp-action="Index" asp-controller="Home">Back to site</a>
+        </div>
         <div class="d-flex align-items-center">
             <partial name="_LoginPartial" />
         </div>

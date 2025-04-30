@@ -38,7 +38,7 @@ public class AdminBookController : Controller
     {
         if (ModelState.IsValid)
         {
-            var bookDto = _mapper.Map<BookDto>(book);
+            var bookDto = _mapper.Map<BookWithDescriptionDto>(book);
             await _bookService.AddNewBookAsync(bookDto);
             TempData["ToastrMessage"] = "Book created successfully.";
             TempData["ToastrType"] = "success";
