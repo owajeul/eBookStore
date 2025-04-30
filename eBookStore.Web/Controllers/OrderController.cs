@@ -61,8 +61,8 @@ public class OrderController : Controller
             return RedirectToAction("Index");
         }
 
-        var userId = _userService.GetUserId();
-        var cart = await _cartService.GetUserCartWithItemsAsync(userId);
+        var user = await _userService.GetUserAsync();
+        var cart = await _cartService.GetUserCartWithItemsAsync(user.UserId);
 
         if (!cart.CartItems.Any())
         {
@@ -73,17 +73,26 @@ public class OrderController : Controller
 
         var orderDto = new OrderDto
         {
-            UserId = userId,
+            UserId = user.UserId,
             ShippingAddress = model.ShippingAddress,
             PhoneNumber = model.PhoneNumber,
             OrderItems = cart.CartItems.Select(ci => new OrderItemDto
             {
                 BookId = ci.BookId,
+                Book = new BookDto
+                {
+                    Id = ci.BookId,
+                    Title = ci.Book.Title,
+                    Author = ci.Book.Author,
+                    ImageUrl = ci.Book.ImageUrl,
+                    Price = ci.Book.Price
+                },
                 Quantity = ci.Quantity,
                 UnitPrice = ci.UnitPrice
             }).ToList()
         };
-        await _orderService.PlaceOrderAsync(orderDto);
+
+        await _orderService.PlaceOrderAsync(orderDto, user.Email);
 
         TempData["ToastrMessage"] = "Order placed successfully.";
         TempData["ToastrType"] = "success";

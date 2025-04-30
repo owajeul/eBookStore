@@ -8,6 +8,7 @@ using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
+using eBookStore.Infrastructure.Services;
 
 namespace eBookStore.Application.Services;
 
@@ -17,30 +18,35 @@ public class OrderService : IOrderService
     private readonly ICartRepository _cartRepository;
     private readonly IBookRepository _bookRepository;
     private readonly IMapper _mapper;
+    private readonly IOrderNotificationService _orderNotificationService;
     private readonly IUnitOfWork _unitOfWork;
+
 
     public OrderService(IOrderRepository orderRepository,
         ICartRepository cartRepository, 
         IBookRepository bookRepository,
         IMapper mapper,
+        IOrderNotificationService orderNotificationService,
         IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
         _bookRepository = bookRepository;
         _mapper = mapper;
+        _orderNotificationService = orderNotificationService;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task PlaceOrderAsync(OrderDto orderDto)
+    public async Task PlaceOrderAsync(OrderDto orderDto, string userEmail)
     {
         try
         {
             ValidateOrderDto(orderDto);
             await _unitOfWork.BeginTransactionAsync();
             await CheckStockAsync(orderDto);
-            await CreateOrderAsync(orderDto);
+            var order = await CreateOrderAsync(orderDto);
             await _unitOfWork.CommitTransactionAsync();
+            await _orderNotificationService.SendOrderConfirmationEmailAsync(userEmail, order);
         }
         catch (Exception ex) when (!(ex is OrderServiceException))
         {
@@ -156,7 +162,7 @@ public class OrderService : IOrderService
         }
     }
 
-    private async Task CreateOrderAsync(OrderDto orderDto)
+    private async Task<OrderDto> CreateOrderAsync(OrderDto orderDto)
     {
         var order = new Order
         {
@@ -179,6 +185,7 @@ public class OrderService : IOrderService
         await _cartRepository.ClearCartAsync(orderDto.UserId);
 
         await _orderRepository.Save();
+        return _mapper.Map<OrderDto>(order);
     }
 
     private async Task<List<OrderDto>> FetchUserOrdersAsync(string userId)
