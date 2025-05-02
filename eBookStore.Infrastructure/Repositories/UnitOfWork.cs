@@ -33,4 +33,9 @@ public class UnitOfWork : IUnitOfWork
     {
         await _transaction.RollbackAsync();
     }
+
+    public async Task SaveAsync()
+    {
+        await _dbContext.SaveChangesAsync();
+    }
 }

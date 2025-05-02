@@ -221,20 +221,14 @@ namespace eBookStore.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var userDto = _mapper.Map<ApplicationUser>(user);
-                var result = await _userService.u
-                if (result.Succeeded)
-                {
-                    TempData["ToastrMessage"] = "Profile updated successfully.";
-                    TempData["ToastrType"] = "success";
-                    return RedirectToAction(nameof(Profile));
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                var userDto = _mapper.Map<UserDto>(user);
+                await _userService.UpdateUserProfileAsync(userDto);
+
+                TempData["ToastrMessage"] = "Profile updated successfully.";
+                TempData["ToastrType"] = "success";
+                return RedirectToAction(nameof(Profile));
             }
-            return View(userVm);
+            return View(user);
         }
     }
 }

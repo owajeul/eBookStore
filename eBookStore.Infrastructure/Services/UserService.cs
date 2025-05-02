@@ -19,16 +19,20 @@ public class UserService : IUserService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOrderService _orderService;
+    private readonly IUnitOfWork _unitOfWork;   
 
     public UserService(
+        
         UserManager<ApplicationUser> userManager, 
         IHttpContextAccessor httpContextAccessor,
-        IOrderService orderService
+        IOrderService orderService,
+        IUnitOfWork unitOfWork
         )
     {
         _userManager = userManager;
         _httpContextAccessor = httpContextAccessor;
         _orderService = orderService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<UserDto> GetUserAsync()
@@ -78,13 +82,12 @@ public class UserService : IUserService
     {
         var user = await _userManager.FindByIdAsync(userDto.UserId);
         if (user == null) throw new NotFoundException("User not found");
-        var updateUser = new ApplicationUser
-        {
-            PhoneNumber = userDto.PhoneNumber,
-            Address = userDto.Address
-        };
+        user.Name = userDto.Name;
+        user.PhoneNumber = userDto.PhoneNumber;
+        user.Address = userDto.Address;
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded) throw new Exception("Failed to update user profile");
+
     }
 
 
