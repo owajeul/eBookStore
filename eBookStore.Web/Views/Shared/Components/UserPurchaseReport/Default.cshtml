@@ -1,0 +1,28 @@
+﻿<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Phone</th>
+            <th>Most Purchased Genre</th>
+            <th>Total Spend</th>
+            <th>Total Books Purchased</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.UserName</td>
+                <td>@item.PhoneNumber</td>
+                <td>@item.MostPurchasedGenre</td>
+                <td>@item.TotalSpend.ToString("C")</td>
+                <td>@item.TotalBooksPurchased</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.ShowAll != null)
+{
+   
+}

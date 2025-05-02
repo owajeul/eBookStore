@@ -160,8 +160,10 @@ namespace eBookStore.Application.Services;
                     throw new ArgumentException("User ID cannot be empty", nameof(userId));
                 if (sessionCart == null) return;
                 await MergeCartsAsync(userId, sessionCart, dbCart);
+                var currentCart = await _cartRepository.GetUserCartWithItemsAsync(userId);
+
         }
-            catch (Exception ex) when (!(ex is CartServiceException))
+        catch (Exception ex) when (!(ex is CartServiceException))
             {
                 throw new CartServiceException($"Failed to merge session cart with database cart for user {userId}", ex);
             }
@@ -321,7 +323,7 @@ namespace eBookStore.Application.Services;
             
             foreach(var item in sessionCart.CartItems)
             {
-                if(dbCart == null)
+                if(dbCart == null || !await IsBookInCartAsync(userId, item.BookId))
                 {
                     await AddBookToCartAsync(userId, item.BookId, item.Quantity);
                 }
@@ -330,7 +332,9 @@ namespace eBookStore.Application.Services;
                     await AddToCartItemQuantityAsync(dbCart.Id, item.BookId, item.Quantity);
                 }
             }
+
         }
+    
 
         private async Task MergeCartItemsAsync(string userId, int dbCartId, CartDto sessionCart)
         {
