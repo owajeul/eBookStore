@@ -9,7 +9,5 @@ namespace eBookStore.Web.ViewModels
         public int TotalOrders { get; set; }
         public decimal TotalRevenue { get; set; }
         public int TotalBooks { get; set; }
-        public List<TopSellingBookVM> TopSellingBooks { get; set; }
-        public List<BookVM> LowStockBooks { get; set; }
     }
 }
