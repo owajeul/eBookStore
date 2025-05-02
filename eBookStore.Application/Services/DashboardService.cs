@@ -9,14 +9,14 @@ using eBookStore.Application.Common.Exceptions;
 
 namespace eBookStore.Application.Services;
 
-public class AdminService : IAdminService
+public class DashboardService : IDashboardService
 {
     private readonly IAdminRepository _adminRepository;
     private readonly IMapper _mapper;
     private const int LOW_STOCK_THRESHOLD = 5;
     private const int MAX_RECORDS_FOR_DASHBOARD = 10;
 
-    public AdminService(IAdminRepository adminRepository, IMapper mapper)
+    public DashboardService(IAdminRepository adminRepository, IMapper mapper)
     {
         _adminRepository = adminRepository;
         _mapper = mapper;

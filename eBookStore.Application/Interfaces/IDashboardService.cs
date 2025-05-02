@@ -2,7 +2,7 @@
 using eBookStore.Application.DTOs;
 namespace eBookStore.Application.Interfaces;
 
-public interface IAdminService
+public interface IDashboardService
 {
     Task<AdminDashboardDto> GetAdminDashboardDataAsync();
 

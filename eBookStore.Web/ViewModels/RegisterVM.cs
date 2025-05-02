@@ -21,6 +21,7 @@ namespace eBookStore.Web.ViewModels
         public string ConfirmPassword { get; set; }
 
         [DisplayName("Phone number")]
+        [Required]
         public string ?PhoneNumber { get; set; }
         public string ?RedirectUrl { get; set; }
     }

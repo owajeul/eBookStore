@@ -1,1 +1,5 @@
-﻿@await Component.InvokeAsync("UserPurchaseReport", new {showAll = true})
+﻿@{
+	ViewData["Title"] = "User Purchase Report";
+	Layout = "_AdminLayout";
+}
+@await Component.InvokeAsync("UserPurchaseReport", new {showAll = true})
