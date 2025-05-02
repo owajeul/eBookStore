@@ -11,5 +11,6 @@ namespace eBookStore.Infrastructure.Data.Identity
     {
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string Address { get; set; }
     }
 }
