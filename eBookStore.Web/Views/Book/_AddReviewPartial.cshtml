@@ -1,0 +1,39 @@
+﻿@model int 
+@{
+	int bookId = Model;
+}
+<div class="collapse mb-5" id="addReviewForm">
+    <div class="card border-0 bg-light rounded-4 p-4">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Write Your Review</h5>
+            <form method="post">
+                <input type="hidden" name="bookId" value="@bookId" />
+
+                <div class="mb-3">
+                    <label for="rating" class="form-label">Your Rating <span class="text-danger">*</span></label>
+                    <div class="d-flex align-items-center">
+                        <select class="form-select" id="rating" name="rating" required style="max-width: 200px">
+                            <option value="5">5 - Excellent</option>
+                            <option value="4">4 - Good</option>
+                            <option value="3">3 - Average</option>
+                            <option value="2">2 - Poor</option>
+                            <option value="1">1 - Terrible</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Your Review <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="comment" name="comment" rows="4" placeholder="Share your thoughts about this book..." required></textarea>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#addReviewForm">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

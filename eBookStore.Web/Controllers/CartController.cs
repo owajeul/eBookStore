@@ -165,7 +165,26 @@ public class CartController : Controller
     public async Task<IActionResult> DeleteCartItem(int cartId, int bookId)
     {
         var userId = _userService.GetUserId();
-        await _cartService.RemoveFromCartAsync(cartId, bookId);
+        if(string.IsNullOrEmpty(userId))
+        {
+            var sessionCartJson = HttpContext.Session.GetString("Cart");
+            var cart = new CartVM();
+            if (!string.IsNullOrEmpty(sessionCartJson))
+            {
+                cart = JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
+            }
+            var cartItem = cart.CartItems.FirstOrDefault(c => c.BookId == bookId);
+            if (cartItem != null)
+            {
+                cart.CartItems.Remove(cartItem);
+            }
+            HttpContext.Session.SetString("Cart", JsonConvert.SerializeObject(cart));
+
+        }
+        else
+        {
+            await _cartService.RemoveFromCartAsync(cartId, bookId);
+        }
         return Ok();
     }
 

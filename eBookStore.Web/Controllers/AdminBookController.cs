@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
+using eBookStore.Infrastructure.Repositories;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +16,17 @@ public class AdminBookController : Controller
         _bookService = bookService;
         _mapper = mapper;
     }
-
+    public async Task<IActionResult> Index()
+    {
+        var books = await _bookService.GetAllBooksAsync();
+        var booksViewModel = _mapper.Map<List<BookVM>>(books);
+        return View(booksViewModel);
+    }
     public async Task<IActionResult> Details(int id)
     {
         var book = await _bookService.GetBookAsync(id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-        return View(book);
+        var bookViewModel = _mapper.Map<BookVM>(book);
+        return View(bookViewModel);
     }
     public IActionResult Create()
     {
@@ -35,7 +38,7 @@ public class AdminBookController : Controller
     {
         if (ModelState.IsValid)
         {
-            var bookDto = _mapper.Map<BookDto>(book);
+            var bookDto = _mapper.Map<BookWithDescriptionDto>(book);
             await _bookService.AddNewBookAsync(bookDto);
             TempData["ToastrMessage"] = "Book created successfully.";
             TempData["ToastrType"] = "success";
@@ -46,11 +49,8 @@ public class AdminBookController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         var book = await _bookService.GetBookAsync(id);
-        if (book == null)
-        {
-            return NotFound();
-        }
-        return View(book);
+        var bookViewModel = _mapper.Map<BookVM>(book);  
+        return View(bookViewModel);
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -58,11 +58,11 @@ public class AdminBookController : Controller
     {
         if (ModelState.IsValid)
         {
-            var bookDto = _mapper.Map<BookDto>(book);
+            var bookDto = _mapper.Map<BookWithDescriptionDto>(book);
             await _bookService.UpdateBookAsync(bookDto);
             TempData["ToastrMessage"] = "Book updated successfully.";
             TempData["ToastrType"] = "success";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Book", new {id = book.Id});
         }
         return View(book);
     }
@@ -88,10 +88,6 @@ public class AdminBookController : Controller
     [HttpPost]
     public async Task<IActionResult> UpdateBookStock(int id, int stock)
     {
-        if(stock < 0)
-        {
-            return BadRequest("Stock cannot be negative.");
-        }
         await _bookService.UpdateBookStockAsync(id, stock);
         return Ok(new {message = "Stock updated successfully", status = "success"});
     }

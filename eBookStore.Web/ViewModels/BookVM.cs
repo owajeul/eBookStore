@@ -21,5 +21,6 @@ namespace eBookStore.Web.ViewModels
         public string ImageUrl { get; set; }
         [Required]
         public int Stock { get; set; }
+
     }
 }

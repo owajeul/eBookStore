@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+	var isAuthenticated = SignInManager.IsSignedIn(User);
+	var isAdmin = SignInManager.IsSignedIn(User) && User.IsInRole(AppConstant.Role_Admin);
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -16,7 +24,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2">
         <div class="container">
             <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
-                <i class="bi bi-book me-2"></i>eBookStore
+                <i class="bi bi-book me-2"></i><span class="text-primary fs-2">Boi</span><span class="text-danger fs-3">Sondhani</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,12 +41,12 @@
                     <ul id="autocompleteList" class="list-group position-absolute mt-5 w-100 d-none" style="z-index: 1050;"></ul>
                 </div>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="AdminBook" asp-action="Index">Books</a>
-                    </li>
+						@if (isAdmin)
+						{
+                            <li class="nav-item">
+							    <a class="nav-link text-dark" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            </li>
+						}
                 </ul>
                     <div class="d-flex align-items-center">
                         @await Component.InvokeAsync("CartIcon")

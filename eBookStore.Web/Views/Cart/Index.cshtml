@@ -45,7 +45,7 @@
                     <div class="card-body p-0">
                         @foreach (var cartItem in Model.CartItems)
                         {
-                            <div id="@string.Concat("cart-item-", cartItem.Id)" data-cartItemId="@cartItem.Id" class="p-3 border-bottom @(Model.CartItems.Last() == cartItem ? "border-0" : "")">
+                            <div id="@string.Concat("book-item-", cartItem.BookId)" data-cartItemId="@cartItem.Id" class="p-3 border-bottom @(Model.CartItems.Last() == cartItem ? "border-0" : "")">
                                 <div class="row align-items-center g-3">
                                     <div class="col-md-2 col-4">
                                         <img src="@cartItem.Book.ImageUrl" class="img-fluid rounded" alt="@cartItem.Book.Title">
@@ -167,7 +167,7 @@
                     data: { cartId: cartId, bookId: bookId },
                     success: function () {
 						toastr["success"]("Item removed from cart successfully!");
-                        $('#cart-item-' + cartItemId).remove();
+                        $('#book-item-' + bookId).remove();
                           var itemCount = parseInt($('#cartItemsCount').text());
                           console.log(itemCount);
 						if (itemCount - 1 == 0) {

@@ -46,7 +46,7 @@
 
                         <div class="text-center mt-2">
                             <span class="text-muted">Already have an account?</span>
-                            <a  class="text-decoration-none ms-1" style="color: #1976D2;" asp-action="Login">Sign in</a>
+                            <a  class="text-decoration-none ms-1" style="color: #1976D2;" asp-action="Login" asp-route-returnUrl="@Model.RedirectUrl">Sign in</a>
                         </div>
                     </form>
                 </div>

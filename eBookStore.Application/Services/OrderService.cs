@@ -8,6 +8,7 @@ using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
+using eBookStore.Infrastructure.Services;
 
 namespace eBookStore.Application.Services;
 
@@ -15,25 +16,52 @@ public class OrderService : IOrderService
 {
     private readonly IOrderRepository _orderRepository;
     private readonly ICartRepository _cartRepository;
+    private readonly IBookRepository _bookRepository;
     private readonly IMapper _mapper;
+    private readonly IOrderNotificationService _orderNotificationService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository, IMapper mapper)
+
+    public OrderService(IOrderRepository orderRepository,
+        ICartRepository cartRepository, 
+        IBookRepository bookRepository,
+        IMapper mapper,
+        IOrderNotificationService orderNotificationService,
+        IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _cartRepository = cartRepository;
+        _bookRepository = bookRepository;
         _mapper = mapper;
+        _orderNotificationService = orderNotificationService;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task PlaceOrderAsync(OrderDto orderDto)
+    public async Task PlaceOrderAsync(OrderDto orderDto, string userEmail)
     {
         try
         {
             ValidateOrderDto(orderDto);
-            await CreateOrderAsync(orderDto);
+            await _unitOfWork.BeginTransactionAsync();
+            await CheckStockAsync(orderDto);
+            var order = await CreateOrderAsync(orderDto);
+            await _unitOfWork.CommitTransactionAsync();
+            await _orderNotificationService.SendOrderConfirmationEmailAsync(userEmail, order);
         }
         catch (Exception ex) when (!(ex is OrderServiceException))
         {
+            await _unitOfWork.RollbackTransactionAsync();
             throw new OrderServiceException($"Failed to place order for user {orderDto?.UserId}", ex);
+        }
+    }
+
+    public async Task CheckStockAsync(OrderDto orderDto)
+    {
+        foreach (var item in orderDto.OrderItems)
+        {
+            var book = await _bookRepository.Get(b => b.Id == item.BookId);
+            if (book.Stock < item.Quantity)
+                throw new OrderServiceException($"Not enough stock for book id: {book.Id} title:{book.Title}");
         }
     }
 
@@ -100,7 +128,7 @@ public class OrderService : IOrderService
 
     private void ValidateOrderStatus(string status)
     {
-        if ( AppConstant.ValidStatuses.Contains(status))
+        if (!AppConstant.ValidStatuses.Contains(status))
             throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", AppConstant.ValidStatuses)}", nameof(status));
     }
 
@@ -134,7 +162,7 @@ public class OrderService : IOrderService
         }
     }
 
-    private async Task CreateOrderAsync(OrderDto orderDto)
+    private async Task<OrderDto> CreateOrderAsync(OrderDto orderDto)
     {
         var order = new Order
         {
@@ -157,6 +185,7 @@ public class OrderService : IOrderService
         await _cartRepository.ClearCartAsync(orderDto.UserId);
 
         await _orderRepository.Save();
+        return _mapper.Map<OrderDto>(order);
     }
 
     private async Task<List<OrderDto>> FetchUserOrdersAsync(string userId)
@@ -171,7 +200,7 @@ public class OrderService : IOrderService
 
     private async Task<List<OrderDto>> FetchAllOrdersAsync()
     {
-        var orders = _orderRepository.GetAllOrdersAsync();
+        var orders = await _orderRepository.GetAllOrdersAsync();
 
         if (orders == null)
             return new List<OrderDto>();
@@ -181,7 +210,7 @@ public class OrderService : IOrderService
 
     private async Task<OrderDto> FetchOrderByIdAsync(int id)
     {
-        var order = await _orderRepository.Get(o => o.Id == id);
+        var order = await _orderRepository.GetOrderById(id);
 
         if (order == null)
             throw new OrderNotFoundException($"Order with ID {id} not found");

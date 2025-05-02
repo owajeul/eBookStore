@@ -26,5 +26,6 @@ namespace eBookStore.Domain.Entities
         public string ImageUrl { get; set; }
         [Required]
         public int Stock { get; set; }
+        public List<BookReview> Reviews { get; set; } = new List<BookReview>();
     }
 }

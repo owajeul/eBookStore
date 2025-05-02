@@ -37,6 +37,7 @@ public class Repository<T> :IRepository<T> where T : class
         if (filter != null)
         {
             query = query.Where(filter);
+            query = query.AsNoTracking();
         }
         return query.FirstOrDefaultAsync();
     }
@@ -47,7 +48,7 @@ public class Repository<T> :IRepository<T> where T : class
     }
     public void Update(T entity)
     {
-        _dbContext.Update(entity);
+        _dbContext.Entry(entity).State = EntityState.Modified;
     }
     public void Remove(T entity)
     {
