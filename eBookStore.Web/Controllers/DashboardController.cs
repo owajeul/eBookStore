@@ -39,5 +39,9 @@ namespace eBookStore.Web.Controllers
             var topSellingBooksViewModel = _mapper.Map<List<TopSellingBookVM>>(topSellingBooks);
             return View(topSellingBooksViewModel);
         }
+        public IActionResult UserPurchaseReport()
+        {
+            return View();
+        }
     }
 }
