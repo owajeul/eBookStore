@@ -1,7 +1,9 @@
-﻿using eBookStore.Application.Interfaces;
+﻿using eBookStore.Application.DTOs;
+using eBookStore.Application.Interfaces;
 using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 
 namespace eBookStore.Infrastructure.Repositories
 {
@@ -38,5 +40,29 @@ namespace eBookStore.Infrastructure.Repositories
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        public async Task<List<UserPurchaseReportDto>> GetUserPurchaseReportsAsync()
+        {
+            var reports = await _dbContext.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Book)
+                .GroupBy(o => o.UserId)
+                .Select(g => new UserPurchaseReportDto
+                {
+                    UserId = g.Key,
+                    UserName = _dbContext.Users.Where(u => u.Id == g.Key).Select(u => u.Name).FirstOrDefault(),
+                    PhoneNumber = _dbContext.Users.Where(u => u.Id == g.Key).Select(u => u.PhoneNumber).FirstOrDefault(),
+                    MostPurchasedGenre = g.SelectMany(o => o.OrderItems)
+                                          .GroupBy(oi => oi.Book.Genre)
+                                          .OrderByDescending(gr => gr.Sum(oi => oi.Quantity))
+                                          .Select(gr => gr.Key)
+                                          .FirstOrDefault(),
+                    TotalSpend = g.Sum(o => o.TotalPrice),
+                    TotalBooksPurchased = g.SelectMany(o => o.OrderItems).Sum(oi => oi.Quantity)
+                })
+                .OrderByDescending(r => r.TotalSpend)
+                .ToListAsync();
+
+            return reports;
+        }
     }
 }
