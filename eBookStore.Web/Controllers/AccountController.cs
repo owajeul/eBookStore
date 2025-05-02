@@ -56,7 +56,7 @@ namespace eBookStore.Web.Controllers
                     TempData["ToastrType"] = "success";
 
                     var user = await _userManager.FindByEmailAsync(loginVM.Email);
-                    
+
                     await MergeCartOnOrRegisterLogin();
                     return RedirectUser(loginVM.RedirectUrl);
                 }
@@ -182,10 +182,10 @@ namespace eBookStore.Web.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var sessionCart = GetSessionCart();
-            var dbCart =await _cartService.GetUserCartAsync(userId);
+            var dbCart = await _cartService.GetUserCartAsync(userId);
             var sessionCartDto = _mapper.Map<CartDto>(sessionCart);
             await _cartService.MergeSessionCartWithDbCartAsync(
-                userId, 
+                userId,
                 sessionCartDto,
                 dbCart
             );
@@ -195,7 +195,7 @@ namespace eBookStore.Web.Controllers
         private CartVM? GetSessionCart()
         {
             var sessionCartJson = HttpContext.Session.GetString("Cart");
-            if(string.IsNullOrEmpty(sessionCartJson)) return null;
+            if (string.IsNullOrEmpty(sessionCartJson)) return null;
             return JsonConvert.DeserializeObject<CartVM>(sessionCartJson);
         }
 
@@ -209,5 +209,11 @@ namespace eBookStore.Web.Controllers
             var userProfileData = await _userService.GetUserProfileDataAsync();
             return View(_mapper.Map<ProfileVM>(userProfileData));
         }
+        public async Task<IActionResult> EditProfile(string userId)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+            return View(_mapper.Map<UserVM>(user));
+        }
+
     }
 }

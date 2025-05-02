@@ -39,7 +39,21 @@ public class UserService : IUserService
             UserId = userId,
             Name = user.Name,
             Email = user.Email,
-            PhoneNumber = user.PhoneNumber
+            PhoneNumber = user.PhoneNumber,
+            Address = user.Address
+        };
+    }
+
+    public async Task<UserDto> GetUserByIdAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        return new UserDto
+        {
+            UserId = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            Address = user.Address
         };
     }
     public string GetUserId()
@@ -58,5 +72,7 @@ public class UserService : IUserService
             OrderHistory = orders
         };
     }
+
+
 }
 
