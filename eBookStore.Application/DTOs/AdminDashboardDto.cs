@@ -13,7 +13,5 @@ namespace eBookStore.Application.DTOs
         public int TotalOrders { get; set; }
         public decimal TotalRevenue { get; set; }
         public int TotalBooks { get; set; }
-        public List<TopSellingBookDto> TopSellingBooks { get; set; }
-        public List<BookDto> LowStockBooks { get; set; }
     }
 }
