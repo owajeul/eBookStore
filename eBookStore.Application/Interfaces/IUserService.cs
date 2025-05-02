@@ -13,5 +13,6 @@ namespace eBookStore.Application.Interfaces
         Task<UserDto> GetUserByIdAsync(string userId);
         Task<ProfileDto> GetUserProfileDataAsync();
         string GetUserId();
+        Task UpdateUserProfileAsync(UserDto userDto);
     }
 }

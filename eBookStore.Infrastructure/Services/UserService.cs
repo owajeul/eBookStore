@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eBookStore.Application.DTOs;
 using eBookStore.Infrastructure.Repositories;
+using SendGrid.Helpers.Errors.Model;
 
 namespace eBookStore.Infrastructure.Services;
 
@@ -71,6 +72,19 @@ public class UserService : IUserService
             UserInfo = user,
             OrderHistory = orders
         };
+    }
+
+    public async Task UpdateUserProfileAsync(UserDto userDto)
+    {
+        var user = await _userManager.FindByIdAsync(userDto.UserId);
+        if (user == null) throw new NotFoundException("User not found");
+        var updateUser = new ApplicationUser
+        {
+            PhoneNumber = userDto.PhoneNumber,
+            Address = userDto.Address
+        };
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded) throw new Exception("Failed to update user profile");
     }
 
 

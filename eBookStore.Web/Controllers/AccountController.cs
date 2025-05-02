@@ -215,5 +215,26 @@ namespace eBookStore.Web.Controllers
             return View(_mapper.Map<UserVM>(user));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(UserVM user)
+        {
+            if (ModelState.IsValid)
+            {
+                var userDto = _mapper.Map<ApplicationUser>(user);
+                var result = await _userService.u
+                if (result.Succeeded)
+                {
+                    TempData["ToastrMessage"] = "Profile updated successfully.";
+                    TempData["ToastrType"] = "success";
+                    return RedirectToAction(nameof(Profile));
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            return View(userVm);
+        }
     }
 }
