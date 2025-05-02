@@ -16,6 +16,7 @@ namespace eBookStore.Web.Mapping
             CreateMap<BookStockAndSalesDto, BookStockAndSalesVM>();
             CreateMap<ProfileDto, ProfileVM>();
             CreateMap<UserDto, UserVM>();
+            CreateMap<UserVM, UserDto>();
             CreateMap<CartDto, CartVM>();
             CreateMap<CartVM, CartDto>();
             CreateMap<CartItemDto, CartItemVM>();

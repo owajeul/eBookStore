@@ -30,7 +30,7 @@ builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

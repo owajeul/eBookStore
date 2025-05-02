@@ -1,6 +1,6 @@
-﻿@model List<BookVM>	
+﻿
 @{
     Layout = "_AdminLayout";
 }
-@await Component.InvokeAsync("LowStockBooks", Model)
+@await Component.InvokeAsync("LowStockBooks", new {showAll = true})
 
