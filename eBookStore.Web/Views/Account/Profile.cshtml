@@ -29,9 +29,9 @@
                     <h4 class="fw-bold mb-1">@Model.UserInfo.Name</h4>
                     <p class="text-muted mb-3">@Model.UserInfo.Email</p>
                     <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary" type="button">
+                        <a asp-action="EditProfile" asp-route-userId="@Model.UserInfo.UserId" class="btn btn-outline-primary">
                             <i class="bi bi-pencil me-2"></i>Edit Profile
-                        </button>
+                        </a>
                         <button class="btn btn-outline-secondary" type="button">
                             <i class="bi bi-key me-2"></i>Change Password
                         </button>
