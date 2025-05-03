@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using eBookStore.Application.Common.Exceptions;
@@ -53,14 +54,8 @@ public class BookService : IBookService
     {
         try
         {
-            if (id <= 0)
-                throw new ArgumentException("Book ID must be greater than zero", nameof(id));
-
+            ValidateBookId(id);
             return await FetchBookByIdAsync(id);
-        }
-        catch (BookNotFoundException)
-        {
-            throw;
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
@@ -84,12 +79,8 @@ public class BookService : IBookService
     {
         try
         {
-            if (bookId <= 0)
-                throw new ArgumentException("Book ID must be greater than zero", nameof(bookId));
-            var bookReview = await _unitOfWork.Book.GetBookReviewAsync(bookId, _userService.GetUserId());
-            if (bookReview == null)
-                throw new BookNotFoundException($"No review found for book with ID {bookId}");
-            return _mapper.Map<BookReviewDto>(bookReview);
+            ValidateBookId(bookId);
+            return await FetchBookReviewOfCurrentUser(bookId);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
@@ -101,44 +92,25 @@ public class BookService : IBookService
     {
         try
         {
-           return await FetchBookWithReviewsAsync(bookId);
-        }
-        catch(BookNotFoundException)
-        {
-            throw;
+            ValidateBookId(bookId);
+            return await FetchBookWithReviewsAsync(bookId);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
             throw new BookServiceException($"Failed to retrieve book with ID {bookId}", ex);
         }
     }
-    public async Task<List<BookDto>> GetFilteredBooksAsync(BookFilterDto filter)
+    
+    public async Task<BookStockAndSalesDto> GetBookStockAsync(int bookId)
     {
         try
         {
-            if (filter == null)
-                throw new ArgumentNullException(nameof(filter));
-
-            return await FilterBooksAsync(filter);
+            ValidateBookId(bookId);
+            return await FetchBookStockAsync(bookId);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
-            throw new BookServiceException("Failed to retrieve filtered books", ex);
-        }
-    }
-
-    public async Task<BookStockAndSalesDto> GetBookStockAsync(int id)
-    {
-        try
-        {
-            if (id <= 0)
-                throw new ArgumentException("Book ID must be greater than zero", nameof(id));
-
-            return await FetchBookStockAsync(id);
-        }
-        catch (Exception ex) when (!(ex is BookServiceException))
-        {
-            throw new BookServiceException($"Failed to retrieve stock for book with ID {id}", ex);
+            throw new BookServiceException($"Failed to retrieve stock for book with ID {bookId}", ex);
         }
     }
 
@@ -146,13 +118,10 @@ public class BookService : IBookService
     {
         try
         {
-            if (id <= 0)
-                throw new ArgumentException("Book ID must be greater than zero", nameof(id));
-
-            if (stock < 0)
-                throw new ArgumentException("Stock value cannot be negative", nameof(stock));
-
+            ValidateBookId(id);
+            ValidateStock(stock);
             await UpdateStockForBookAsync(id, stock);
+            await _unitOfWork.SaveAsync();
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
@@ -164,10 +133,8 @@ public class BookService : IBookService
     {
         try
         {
-            if (bookDto == null)
-                throw new ArgumentNullException(nameof(bookDto));
-
             await AddBookAsync(bookDto);
+            await _unitOfWork.SaveAsync();
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
@@ -179,13 +146,9 @@ public class BookService : IBookService
     {
         try
         {
-            if (bookDto == null)
-                throw new ArgumentNullException(nameof(bookDto));
-
-            if (bookDto.Id <= 0)
-                throw new ArgumentException("Book ID must be greater than zero", nameof(bookDto.Id));
-
+            ValidateBookId(bookDto.Id);
             await UpdateExistingBookAsync(bookDto);
+            await _unitOfWork.SaveAsync();
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
@@ -195,13 +158,24 @@ public class BookService : IBookService
 
     public async Task<bool> HasUserPurchasedBookAsync(int bookId)
     {
-        return await _unitOfWork.Book.HasUserPurchasedBookAsync(bookId, _userService.GetUserId());
+        try
+        {
+            ValidateBookId(bookId);
+            return await _unitOfWork.Book.HasUserPurchasedBookAsync(bookId, _userService.GetUserId());
+        }
+        catch (Exception ex) when (!(ex is BookServiceException))
+        {
+            throw new BookServiceException($"Failed to check if user has purchased book with ID {bookId}", ex);
+        }
     }
     public async Task ReviewBookAsync(int bookId, int rating, string comment)
     {
         try
         {
-           await AddBookReviewOfUserAsync(bookId, rating, comment);
+            ValidateBookId(bookId);
+            ValidateRating(rating);
+            ValidateComment(comment);
+            await AddBookReviewOfUserAsync(bookId, rating, comment);
            await _unitOfWork.SaveAsync();
         }
         catch(Exception ex) when (!(ex is BookServiceException))
@@ -245,38 +219,13 @@ public class BookService : IBookService
         };
     }
 
-    private async Task<List<BookDto>> FilterBooksAsync(BookFilterDto filter)
+    private async Task<BookReviewDto> FetchBookReviewOfCurrentUser(int bookId)
     {
-        var books = await _unitOfWork.Book.GetAllAsync();
-
-        if (books == null)
-            return new List<BookDto>();
-
-        if (!string.IsNullOrEmpty(filter.Genre))
-        {
-            books = books.Where(b => b.Genre.ToLower() == filter.Genre.ToLower()).ToList();
-        }
-
-        if (filter.MaxPrice.HasValue)
-        {
-            books = books.Where(b => b.Price <= filter.MaxPrice.Value).ToList();
-        }
-
-        if (!string.IsNullOrEmpty(filter.SortBy))
-        {
-            if (filter.SortBy.ToLower() == AppConstant.SortByPriceAsc.ToLower())
-            {
-                books = books.OrderBy(b => b.Price).ToList();
-            }
-            else
-            {
-                books = books.OrderByDescending(b => b.Price).ToList();
-            }
-        }
-
-        return _mapper.Map<List<BookDto>>(books);
+        var bookReview = await _unitOfWork.Book.GetBookReviewAsync(bookId, _userService.GetUserId());
+        if (bookReview == null)
+            throw new BookNotFoundException($"No review found for book with ID {bookId}");
+        return _mapper.Map<BookReviewDto>(bookReview);
     }
-
     private async Task<BookStockAndSalesDto> FetchBookStockAsync(int id)
     {
         var book = await _unitOfWork.Book.Get(b => b.Id == id);
@@ -300,16 +249,13 @@ public class BookService : IBookService
 
         book.Stock = stock;
         _unitOfWork.Book.Update(book);
-        await _unitOfWork.SaveAsync();
     }
 
     private async Task AddBookAsync(BookDto bookDto)
     {
         ValidateBookData(bookDto);
-
         var book = _mapper.Map<Book>(bookDto);
         await _unitOfWork.Book.Add(book);
-        await _unitOfWork.SaveAsync();
     }
 
     private async Task UpdateExistingBookAsync(BookDto bookDto)
@@ -322,7 +268,6 @@ public class BookService : IBookService
 
         var book = _mapper.Map<Book>(bookDto);
         _unitOfWork.Book.Update(book);
-        await _unitOfWork.SaveAsync();
     }
 
     private void ValidateBookData(BookDto bookDto)
@@ -339,18 +284,6 @@ public class BookService : IBookService
 
     private async Task AddBookReviewOfUserAsync(int bookId, int rating, string comment)
     {
-        if(bookId <= 0)
-        {
-            throw new ArgumentException("Book ID must be greater than zero");
-        }
-        if (rating < 1 || rating > 5)
-        {
-            throw new ArgumentException("Rating must be between 1 and 5");
-        }
-        if (string.IsNullOrEmpty(comment))
-        {
-            throw new ArgumentException("Comment cannot be empty");
-        }
         var user = await _userService.GetUserAsync();
         var review = await _unitOfWork.Book.GetBookReviewAsync(bookId, user.UserId);
         if (review != null)
@@ -372,8 +305,6 @@ public class BookService : IBookService
 
     private async Task<BookWithReviewsDto> FetchBookWithReviewsAsync(int bookId)
     {
-        if (bookId <= 0)
-            throw new ArgumentException("Book ID must be greater than zero", nameof(bookId));
         var book = await _unitOfWork.Book.GetBookWithReviewsAsync(bookId);
         if (book == null)
             throw new BookNotFoundException($"Book with ID {bookId} not found");
@@ -384,5 +315,28 @@ public class BookService : IBookService
         bookDto.ReviewCount = totalReviews;
         return bookDto;
     }
+    private void ValidateBookId(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("Book ID must be greater than zero", nameof(id));
+    }
 
+    private void ValidateStock(int stock)
+    {
+        if (stock < 0)
+            throw new ArgumentException("Stock value cannot be negative", nameof(stock));
+    }
+    private void ValidateRating(int rating)
+    {
+        if (rating < 0 || rating > 5)
+            throw new ArgumentOutOfRangeException(nameof(rating), "Rating must be between 0 and 5");
+    }
+    private void ValidateComment(string comment)
+    {
+        if (string.IsNullOrWhiteSpace(comment))
+            throw new ArgumentException("Comment cannot be empty or whitespace.", nameof(comment));
+
+        if (comment.Length > 500)
+            throw new ArgumentException("Comment cannot exceed 1000 characters.", nameof(comment));
+    }
 }
