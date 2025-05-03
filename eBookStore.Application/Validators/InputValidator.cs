@@ -32,5 +32,22 @@ namespace eBookStore.Application.Validators
             if (comment.Length > 500)
                 throw new ArgumentException("Comment cannot exceed 1000 characters.", nameof(comment));
         }
+
+        public static void ValidateCartId(int cartId)
+        {
+            if (cartId <= 0)
+                throw new ArgumentException("Cart ID must be greater than zero", nameof(cartId));
+        }
+        public static void ValidateCartItemQuantity(int quantity)
+        {
+            if (quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
+        }
+        public static void ValidateUserId(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("User ID cannot be empty or whitespace.", nameof(userId));
+
+        }
     }
 }
