@@ -12,27 +12,22 @@ namespace eBookStore.Application.Services
 {
     public class ReportService : IReportService
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IAdminRepository _adminRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ReportService(IOrderRepository orderRepository, IAdminRepository adminRepository, IMapper mapper)
+        public ReportService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _orderRepository = orderRepository;
-            _adminRepository = adminRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
         public async Task<List<UserPurchaseReportDto>> GetUserPurchaseReportsAsync()
         {
-            return await _orderRepository.GetUserPurchaseReportsAsync();
+            return await _unitOfWork.Order.GetUserPurchaseReportsAsync();
         }
         public async Task<List<BookDto>> GetLowStockBooksAsync(int threshold, int? recordsToFetch)
         {
             try
             {
-                if (threshold < 0)
-                    throw new ArgumentException("Threshold cannot be negative", nameof(threshold));
-
                 return await FetchLowStockBooksAsync(threshold, recordsToFetch);
             }
             catch (Exception ex) when (!(ex is AdminServiceException))
@@ -40,24 +35,9 @@ namespace eBookStore.Application.Services
                 throw new AdminServiceException($"Failed to retrieve low stock books with threshold {threshold}", ex);
             }
         }
-
-        public async Task<List<TopSellingBookDto>> GetTopSellingBooksAsync(int count)
-        {
-            try
-            {
-                if (count <= 0)
-                    throw new ArgumentException("Count of top books must be greater than zero", nameof(count));
-
-                return await FetchTopSellingBooksAsync(count);
-            }
-            catch (Exception ex) when (!(ex is AdminServiceException))
-            {
-                throw new AdminServiceException($"Failed to retrieve top {count} selling books", ex);
-            }
-        }
         private async Task<List<BookDto>> FetchLowStockBooksAsync(int threshold, int? recordsToFetch)
         {
-            var lowStockBooks = await _adminRepository.GetLowStockBooksAsync(threshold, recordsToFetch);
+            var lowStockBooks = await _unitOfWork.Admin.GetLowStockBooksAsync(threshold, recordsToFetch);
 
             if (lowStockBooks == null)
                 return new List<BookDto>();
@@ -65,14 +45,25 @@ namespace eBookStore.Application.Services
             return _mapper.Map<List<BookDto>>(lowStockBooks);
         }
 
+        public async Task<List<TopSellingBookDto>> GetTopSellingBooksAsync(int count)
+        {
+            try
+            {
+                return await FetchTopSellingBooksAsync(count);
+            }
+            catch (Exception ex) when (!(ex is AdminServiceException))
+            {
+                throw new AdminServiceException($"Failed to retrieve top {count} selling books", ex);
+            }
+        }
         private async Task<List<TopSellingBookDto>> FetchTopSellingBooksAsync(int count)
         {
-            var topSellingBooksRaw = await _adminRepository.GetTopSellingBooksAsync(count);
+            var topSellingBooks = await _unitOfWork.Admin.GetTopSellingBooksAsync(count);
 
-            if (topSellingBooksRaw == null)
+            if (topSellingBooks == null)
                 return new List<TopSellingBookDto>();
 
-            return topSellingBooksRaw
+            return topSellingBooks
                 .Select(b => new TopSellingBookDto
                 {
                     Id = b.book.Id,
@@ -85,6 +76,6 @@ namespace eBookStore.Application.Services
                 })
                 .ToList();
         }
-    }
 
+    }
 }
