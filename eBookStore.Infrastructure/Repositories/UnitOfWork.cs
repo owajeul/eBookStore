@@ -13,11 +13,11 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _dbContext;
     private IDbContextTransaction _transaction;
-    private IAdminRepository Admin;
-    private IBookRepository Book;
-    private ICartRepository Cart;
-    private IOrderRepository Order;
-    
+    public IAdminRepository Admin { get; private set; }
+    public IBookRepository Book { get; private set; }
+    public ICartRepository Cart { get; private set; }
+    public IOrderRepository Order { get; private set; }
+
     public UnitOfWork(AppDbContext dbContext)
     {
         _dbContext = dbContext;

@@ -41,7 +41,7 @@ public class BookService : IBookService
     {
         try
         {
-            return await FetchAllGenresAsync();
+            return await _unitOfWork.Book.GetDistinctGenresAsync();
         }
         catch (Exception ex)
         {
@@ -219,17 +219,6 @@ public class BookService : IBookService
 
         return _mapper.Map<List<BookDto>>(books);
     }
-
-    private async Task<IEnumerable<string>> FetchAllGenresAsync()
-    {
-        var books = await _unitOfWork.Book.GetAllAsync();
-
-        if (books == null)
-            return new List<string>();
-
-        return books.Select(b => b.Genre).Distinct().ToList();
-    }
-
     private async Task<BookWithDescriptionDto> FetchBookByIdAsync(int id)
     {
         var book = await _unitOfWork.Book.Get(b => b.Id == id);
