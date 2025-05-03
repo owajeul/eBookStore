@@ -13,10 +13,18 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _dbContext;
     private IDbContextTransaction _transaction;
-
+    private IAdminRepository Admin;
+    private IBookRepository Book;
+    private ICartRepository Cart;
+    private IOrderRepository Order;
+    
     public UnitOfWork(AppDbContext dbContext)
     {
         _dbContext = dbContext;
+        Admin = new AdminRepository(_dbContext);
+        Book = new BookRepository(_dbContext);
+        Cart = new CartRepository(_dbContext);
+        Order = new OrderRepository(_dbContext);
     }
 
     public async Task BeginTransactionAsync()
