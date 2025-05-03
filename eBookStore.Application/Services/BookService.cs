@@ -9,6 +9,7 @@ using eBookStore.Application.Common.Exceptions;
 using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
+using eBookStore.Application.Validators;
 using eBookStore.Domain.Entities;
 
 namespace eBookStore.Infrastructure.Services;
@@ -54,7 +55,7 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(id);
+            InputValidator.ValidateBookId(id);
             return await FetchBookByIdAsync(id);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
@@ -79,7 +80,7 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(bookId);
+            InputValidator.ValidateBookId(bookId);
             return await FetchBookReviewOfCurrentUser(bookId);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
@@ -92,7 +93,7 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(bookId);
+            InputValidator.ValidateBookId(bookId);
             return await FetchBookWithReviewsAsync(bookId);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
@@ -105,7 +106,7 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(bookId);
+            InputValidator.ValidateBookId(bookId);
             return await FetchBookStockAsync(bookId);
         }
         catch (Exception ex) when (!(ex is BookServiceException))
@@ -118,8 +119,8 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(id);
-            ValidateStock(stock);
+            InputValidator.ValidateBookId(id);
+            InputValidator.ValidateStock(stock);
             await UpdateStockForBookAsync(id, stock);
             await _unitOfWork.SaveAsync();
         }
@@ -146,7 +147,7 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(bookDto.Id);
+            InputValidator.ValidateBookId(bookDto.Id);
             await UpdateExistingBookAsync(bookDto);
             await _unitOfWork.SaveAsync();
         }
@@ -160,7 +161,7 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(bookId);
+            InputValidator.ValidateBookId(bookId);
             return await _unitOfWork.Book.HasUserPurchasedBookAsync(bookId, _userService.GetUserId());
         }
         catch (Exception ex) when (!(ex is BookServiceException))
@@ -172,9 +173,9 @@ public class BookService : IBookService
     {
         try
         {
-            ValidateBookId(bookId);
-            ValidateRating(rating);
-            ValidateComment(comment);
+            InputValidator.ValidateBookId(bookId);
+            InputValidator.ValidateRating(rating);
+            InputValidator.ValidateComment(comment);
             await AddBookReviewOfUserAsync(bookId, rating, comment);
            await _unitOfWork.SaveAsync();
         }
@@ -315,28 +316,5 @@ public class BookService : IBookService
         bookDto.ReviewCount = totalReviews;
         return bookDto;
     }
-    private void ValidateBookId(int id)
-    {
-        if (id <= 0)
-            throw new ArgumentException("Book ID must be greater than zero", nameof(id));
-    }
-
-    private void ValidateStock(int stock)
-    {
-        if (stock < 0)
-            throw new ArgumentException("Stock value cannot be negative", nameof(stock));
-    }
-    private void ValidateRating(int rating)
-    {
-        if (rating < 0 || rating > 5)
-            throw new ArgumentOutOfRangeException(nameof(rating), "Rating must be between 0 and 5");
-    }
-    private void ValidateComment(string comment)
-    {
-        if (string.IsNullOrWhiteSpace(comment))
-            throw new ArgumentException("Comment cannot be empty or whitespace.", nameof(comment));
-
-        if (comment.Length > 500)
-            throw new ArgumentException("Comment cannot exceed 1000 characters.", nameof(comment));
-    }
+  
 }
