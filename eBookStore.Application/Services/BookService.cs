@@ -14,13 +14,13 @@ namespace eBookStore.Infrastructure.Services;
 
 public class BookService : IBookService
 {
-    private readonly IBookRepository _bookRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
 
-    public BookService(IBookRepository bookRepository, IMapper mapper, IUserService userService)
+    public BookService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
     {
-        _bookRepository = bookRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _userService = userService;
     }
@@ -86,7 +86,7 @@ public class BookService : IBookService
         {
             if (bookId <= 0)
                 throw new ArgumentException("Book ID must be greater than zero", nameof(bookId));
-            var bookReview = await _bookRepository.GetBookReviewAsync(bookId, _userService.GetUserId());
+            var bookReview = await _unitOfWork.Book.GetBookReviewAsync(bookId, _userService.GetUserId());
             if (bookReview == null)
                 throw new BookNotFoundException($"No review found for book with ID {bookId}");
             return _mapper.Map<BookReviewDto>(bookReview);
@@ -195,14 +195,14 @@ public class BookService : IBookService
 
     public async Task<bool> HasUserPurchasedBookAsync(int bookId)
     {
-        return await _bookRepository.HasUserPurchasedBookAsync(bookId, _userService.GetUserId());
+        return await _unitOfWork.Book.HasUserPurchasedBookAsync(bookId, _userService.GetUserId());
     }
     public async Task ReviewBookAsync(int bookId, int rating, string comment)
     {
         try
         {
            await AddBookReviewOfUserAsync(bookId, rating, comment);
-           await _bookRepository.Save();
+           await _unitOfWork.SaveAsync();
         }
         catch(Exception ex) when (!(ex is BookServiceException))
         {
@@ -212,7 +212,7 @@ public class BookService : IBookService
 
     private async Task<List<BookDto>> FetchAllBooksAsync()
     {
-        var books = await _bookRepository.GetAllAsync();
+        var books = await _unitOfWork.Book.GetAllAsync();
 
         if (books == null)
             return new List<BookDto>();
@@ -222,7 +222,7 @@ public class BookService : IBookService
 
     private async Task<IEnumerable<string>> FetchAllGenresAsync()
     {
-        var books = await _bookRepository.GetAllAsync();
+        var books = await _unitOfWork.Book.GetAllAsync();
 
         if (books == null)
             return new List<string>();
@@ -232,7 +232,7 @@ public class BookService : IBookService
 
     private async Task<BookWithDescriptionDto> FetchBookByIdAsync(int id)
     {
-        var book = await _bookRepository.Get(b => b.Id == id);
+        var book = await _unitOfWork.Book.Get(b => b.Id == id);
 
         if (book == null)
             throw new BookNotFoundException($"Book with ID {id} not found");
@@ -242,7 +242,7 @@ public class BookService : IBookService
 
     private async Task<BookWithGenresDto> FetchBooksWithGenresAsync()
     {
-        var books = await _bookRepository.GetAllAsync();
+        var books = await _unitOfWork.Book.GetAllAsync();
 
         if (books == null)
             books = new List<Book>();
@@ -258,7 +258,7 @@ public class BookService : IBookService
 
     private async Task<List<BookDto>> FilterBooksAsync(BookFilterDto filter)
     {
-        var books = await _bookRepository.GetAllAsync();
+        var books = await _unitOfWork.Book.GetAllAsync();
 
         if (books == null)
             return new List<BookDto>();
@@ -290,7 +290,7 @@ public class BookService : IBookService
 
     private async Task<BookStockAndSalesDto> FetchBookStockAsync(int id)
     {
-        var book = await _bookRepository.Get(b => b.Id == id);
+        var book = await _unitOfWork.Book.Get(b => b.Id == id);
 
         if (book == null)
             throw new BookNotFoundException($"Book with ID {id} not found");
@@ -304,14 +304,14 @@ public class BookService : IBookService
 
     private async Task UpdateStockForBookAsync(int id, int stock)
     {
-        var book = await _bookRepository.Get(b => b.Id == id);
+        var book = await _unitOfWork.Book.Get(b => b.Id == id);
 
         if (book == null)
             throw new BookNotFoundException($"Book with ID {id} not found");
 
         book.Stock = stock;
-        _bookRepository.Update(book);
-        await _bookRepository.Save();
+        _unitOfWork.Book.Update(book);
+        await _unitOfWork.SaveAsync();
     }
 
     private async Task AddBookAsync(BookDto bookDto)
@@ -319,21 +319,21 @@ public class BookService : IBookService
         ValidateBookData(bookDto);
 
         var book = _mapper.Map<Book>(bookDto);
-        await _bookRepository.Add(book);
-        await _bookRepository.Save();
+        await _unitOfWork.Book.Add(book);
+        await _unitOfWork.SaveAsync();
     }
 
     private async Task UpdateExistingBookAsync(BookDto bookDto)
     {
         ValidateBookData(bookDto);
 
-        var existingBook = await _bookRepository.Get(b => b.Id == bookDto.Id);
+        var existingBook = await _unitOfWork.Book.Get(b => b.Id == bookDto.Id);
         if (existingBook == null)
             throw new BookNotFoundException($"Book with ID {bookDto.Id} not found");
 
         var book = _mapper.Map<Book>(bookDto);
-        _bookRepository.Update(book);
-        await _bookRepository.Save();
+        _unitOfWork.Book.Update(book);
+        await _unitOfWork.SaveAsync();
     }
 
     private void ValidateBookData(BookDto bookDto)
@@ -363,7 +363,7 @@ public class BookService : IBookService
             throw new ArgumentException("Comment cannot be empty");
         }
         var user = await _userService.GetUserAsync();
-        var review = await _bookRepository.GetBookReviewAsync(bookId, user.UserId);
+        var review = await _unitOfWork.Book.GetBookReviewAsync(bookId, user.UserId);
         if (review != null)
         {
             throw new BookServiceException($"User {user.UserId} has not already reviewed the book");
@@ -378,14 +378,14 @@ public class BookService : IBookService
             CreatedAt = DateTime.UtcNow
         };
 
-        await _bookRepository.AddBookReviewAsync(bookReview);
+        await _unitOfWork.Book.AddBookReviewAsync(bookReview);
     }
 
     private async Task<BookWithReviewsDto> FetchBookWithReviewsAsync(int bookId)
     {
         if (bookId <= 0)
             throw new ArgumentException("Book ID must be greater than zero", nameof(bookId));
-        var book = await _bookRepository.GetBookWithReviewsAsync(bookId);
+        var book = await _unitOfWork.Book.GetBookWithReviewsAsync(bookId);
         if (book == null)
             throw new BookNotFoundException($"Book with ID {bookId} not found");
         var bookDto = _mapper.Map<BookWithReviewsDto>(book);
