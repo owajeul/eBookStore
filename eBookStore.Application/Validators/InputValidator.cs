@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eBookStore.Application.Common.Utilily;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,5 +50,17 @@ namespace eBookStore.Application.Validators
                 throw new ArgumentException("User ID cannot be empty or whitespace.", nameof(userId));
 
         }
+
+        public static void ValidateOrderId(int orderId)
+        {
+            if (orderId <= 0)
+                throw new ArgumentException("Order ID must be greater than zero", nameof(orderId));
+        }
+        public static void ValidateOrderStatus(string status)
+        {
+            if (!AppConstant.ValidStatuses.Contains(status))
+                throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", AppConstant.ValidStatuses)}", nameof(status));
+        }
+
     }
 }
