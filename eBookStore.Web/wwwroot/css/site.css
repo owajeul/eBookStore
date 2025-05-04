@@ -410,3 +410,40 @@ media (max-width: 991.98px) {
     background-color: rgba(230, 126, 34, 0.15);
     color: #e67e22;
 }
+
+
+/*checkout page */
+.checkout-header {
+    background: linear-gradient(45deg, #6c63ff, #5a54d4);
+    color: white;
+    box-shadow: 0 0.25rem 1rem rgba(108, 99, 255, 0.2);
+}
+
+.checkout-card {
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .checkout-card:hover {
+        box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.12);
+    }
+
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease-in-out;
+}
+
+.book-cover {
+    max-width: 80px;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.book-cover:hover {
+    transform: scale(1.05);
+}

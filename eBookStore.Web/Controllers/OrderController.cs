@@ -42,8 +42,6 @@ public class OrderController : Controller
 
         var viewModel = new CheckoutVM
         {
-            ShippingAddress = "",
-            PhoneNumber = "",
             Items = _mapper.Map<List<CartItemVM>>(cart.CartItems)
         };
 
@@ -74,8 +72,6 @@ public class OrderController : Controller
         var orderDto = new OrderDto
         {
             UserId = user.UserId,
-            ShippingAddress = model.ShippingAddress,
-            PhoneNumber = model.PhoneNumber,
             OrderItems = cart.CartItems.Select(ci => new OrderItemDto
             {
                 BookId = ci.BookId,
