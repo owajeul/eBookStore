@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eBookStore.Application.Interfaces;
 using eBookStore.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace eBookStore.Infrastructure.Repositories;
@@ -45,5 +46,16 @@ public class UnitOfWork : IUnitOfWork
     public async Task SaveAsync()
     {
         await _dbContext.SaveChangesAsync();
+    }
+    public void DetachAllEntities()
+    {
+        var changedEntriesCopy = _dbContext.ChangeTracker.Entries()
+            .Where(e => e.State != EntityState.Detached)
+            .ToList();
+
+        foreach (var entry in changedEntriesCopy)
+        {
+            entry.State = EntityState.Detached;
+        }
     }
 }

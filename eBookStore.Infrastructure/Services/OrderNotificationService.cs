@@ -112,8 +112,6 @@ public class OrderNotificationService : IOrderNotificationService
                         <p><strong>Order Number:</strong> #{order.Id}</p>
                         <p><strong>Order Date:</strong> {formattedDate}</p>
                         <p><strong>Status:</strong> {order.Status}</p>
-                        <p><strong>Shipping Address:</strong> {order.ShippingAddress}</p>
-                        <p><strong>Contact Number:</strong> {order.PhoneNumber}</p>
                     </div>
                     
                     <h2>Order Summary</h2>
@@ -134,7 +132,7 @@ public class OrderNotificationService : IOrderNotificationService
             decimal itemTotal = item.UnitPrice * item.Quantity;
             emailContent += $@"
                             <tr>
-                                <td>{item.Book.Title}</td>
+                                <td></td>
                                 <td>{item.Quantity}</td>
                                 <td>${item.UnitPrice.ToString("F2")}</td>
                                 <td>${itemTotal.ToString("F2")}</td>

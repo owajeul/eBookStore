@@ -11,4 +11,5 @@ public interface IUnitOfWork
     Task CommitTransactionAsync();
     Task RollbackTransactionAsync();
     Task SaveAsync();
+    void DetachAllEntities();
 }

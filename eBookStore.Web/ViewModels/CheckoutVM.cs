@@ -6,7 +6,6 @@ namespace eBookStore.Web.ViewModels;
 
 public class CheckoutVM
 {
-    public string PaymentMethod { get; set; }
     [Display(Name = "Shipping address")]
     public AddressVM ShippingAddress { get; set; }
     public AddressVM BillingAddress { get; set; }

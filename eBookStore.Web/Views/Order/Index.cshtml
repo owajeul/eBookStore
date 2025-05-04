@@ -104,7 +104,7 @@
 
                         <div class="mb-4">
                             <div class="form-check mb-3">
-                                <input asp-for="Payment.Method" class="form-check-input" type="radio" id="cardPayment" value="Card" checked>
+                                <input asp-for="@Model.Payment.Method" class="form-check-input" type="radio" id="cardPayment" value="@AppConstant.PaymentMethodCreditCard" checked>
                                 <label class="form-check-label d-flex align-items-center" for="cardPayment">
                                     <i class="bi bi-credit-card fs-4 me-2 text-primary"></i>
                                     <span class="fw-medium">Credit/Debit Card</span>
@@ -174,7 +174,7 @@
                             </div>
 
                             <div class="form-check">
-                                <input asp-for="@Model.Payment.Method" class="form-check-input" type="radio" id="codPayment" value="COD">
+                                <input asp-for="@Model.Payment.Method" class="form-check-input" type="radio" id="codPayment" value="@AppConstant.PaymentMethodCOD">
                                 <label class="form-check-label d-flex align-items-center" for="codPayment">
                                     <i class="bi bi-cash-stack fs-4 me-2 text-success"></i>
                                     <span class="fw-medium">Cash on Delivery</span>

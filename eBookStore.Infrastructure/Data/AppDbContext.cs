@@ -22,6 +22,13 @@ namespace eBookStore.Infrastructure.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<BookReview> BookReviews { get; set; }
+        public void onModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Order>().OwnsOne(o => o.ShippingAddress);
+            modelBuilder.Entity<Order>().OwnsOne(o => o.BillingAddress);
+        }
 
     }
 }

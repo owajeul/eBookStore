@@ -32,6 +32,7 @@ namespace eBookStore.Web.Mapping
             CreateMap<BookReviewDto, BookReviewVM>();
             CreateMap<LoginVM, LoginDto>();
             CreateMap<RegisterVM, RegisterDto>();   
+            CreateMap<AddressVM, AddressDto>();
         }
     }
 }

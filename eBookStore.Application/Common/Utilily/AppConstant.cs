@@ -16,6 +16,11 @@ namespace eBookStore.Application.Common.Utilily
         public const string StatusDelivered = "Delivered";
         public const string StatusCancelled = "Cancelled";
 
+        public const string PaymentMethodCreditCard = "CreditCard";
+        public const string PaymentMethodCOD = "COD";
+        public const string PaymentStatusPending = "Pending";
+        public const string PaymentStatusPaid = "Paid";
+
         public const string SortByPriceAsc = "PriceAsc";
         public const string SortByPriceDesc = "PriceDesc";
 

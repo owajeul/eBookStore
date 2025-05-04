@@ -10,9 +10,10 @@ namespace eBookStore.Domain.Entities
     {
         public int Id { get; set; }
         public DateTime OrderDate { get; set; }
+        public int ShippingAddressId { get; set; }  
         public Address ShippingAddress { get; set; }
+        public int BillingAddressId { get; set; }
         public Address BillingAddress { get; set; }
-        public string PhoneNumber { get; set; }
         public decimal TotalPrice { get; set; }
         public string UserId { get; set; }
         public string Status { get; set; }

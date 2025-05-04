@@ -39,6 +39,7 @@ public class OrderService : IOrderService
             await CheckStockAsync(orderDto);
             order = await CreateOrderAsync(orderDto);
             await _unitOfWork.Cart.ClearCartAsync(orderDto.UserId);
+            await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitTransactionAsync();
         }
         catch (Exception ex)
@@ -60,6 +61,7 @@ public class OrderService : IOrderService
     }
     private async Task<OrderDto> CreateOrderAsync(OrderDto orderDto)
     {
+        _unitOfWork.DetachAllEntities();
         var order = _mapper.Map<Order>(orderDto);
         var savedOrder = await _unitOfWork.Order.AddOrderAsync(order);
         return _mapper.Map<OrderDto>(savedOrder);

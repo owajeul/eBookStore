@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
 using eBookStore.Application.Services;
@@ -52,6 +53,18 @@ public class OrderController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceOrder(CheckoutVM model)
     {
+        if (model.Payment.Method == AppConstant.PaymentMethodCOD)
+        {
+            var cardPaymentErrors = ModelState.Keys
+                .Where(k => k.StartsWith("Payment.CardPayment."))
+                .ToList();
+
+            foreach (var error in cardPaymentErrors)
+            {
+                ModelState.Remove(error);
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             TempData["ToastrMessage"] = "Please fill in all required fields.";
@@ -72,6 +85,12 @@ public class OrderController : Controller
         var orderDto = new OrderDto
         {
             UserId = user.UserId,
+            OrderDate = DateTime.UtcNow,
+            ShippingAddress = _mapper.Map<AddressDto>(model.ShippingAddress),
+            BillingAddress = _mapper.Map<AddressDto>(model.BillingAddress),
+            PaymentMethod = model.Payment.Method,
+            PaymentStatus = AppConstant.PaymentStatusPending,
+            Status = AppConstant.StatusPending,
             OrderItems = cart.CartItems.Select(ci => new OrderItemDto
             {
                 BookId = ci.BookId,
@@ -87,6 +106,11 @@ public class OrderController : Controller
                 UnitPrice = ci.UnitPrice
             }).ToList()
         };
+
+        if(model.Payment.Method == AppConstant.PaymentMethodCreditCard)
+        {
+          orderDto.PaymentStatus = AppConstant.PaymentStatusPaid;
+        }
 
         await _orderService.PlaceOrderAsync(orderDto, user.Email);
 

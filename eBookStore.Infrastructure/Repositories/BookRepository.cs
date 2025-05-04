@@ -21,7 +21,7 @@ public class BookRepository : Repository<Book>, IBookRepository
     }
     public async Task<decimal> GetBookPriceAsync(int bookId)
     {
-        var book = await _dbContext.Books.FindAsync(bookId);
+        var book = await Get(b => b.Id  == bookId);
         return book.Price;
     }
 
