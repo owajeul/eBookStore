@@ -38,6 +38,7 @@ public class OrderService : IOrderService
             await _unitOfWork.BeginTransactionAsync();
             await CheckStockAsync(orderDto);
             orderId = await CreateOrderAsync(orderDto);
+            await UpdateStockAfterOrderAsync(orderDto);
             await _unitOfWork.Cart.ClearCartAsync(orderDto.UserId);
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitTransactionAsync();
@@ -65,6 +66,19 @@ public class OrderService : IOrderService
         var order = _mapper.Map<Order>(orderDto);
         var savedOrderId = await _unitOfWork.Order.AddOrderAsync(order);
         return savedOrderId;
+    }
+    private async Task UpdateStockAfterOrderAsync(OrderDto orderDto)
+    {
+        foreach (var item in orderDto.OrderItems)
+        {
+            var book = await _unitOfWork.Book.Get(b => b.Id == item.BookId);
+            if (book == null)
+            {
+                throw new BookNotFoundException($"Book with ID {item.BookId} not found.");
+            }
+            book.Stock -= item.Quantity;
+            _unitOfWork.Book.Update(book);
+        }
     }
 
     public async Task<List<OrderDto>> GetUserOrdersAsync(string userId)
