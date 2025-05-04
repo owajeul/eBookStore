@@ -8,8 +8,10 @@ public class OrderVM
     public DateTime OrderDate { get; set; }
     public string Status { get; set; }
     public string UserId { get; set; }
-    public string ShippingAddress { get; set; }
-    public string PhoneNumber { get; set; }
-    public List<OrderItemVM> OrderItems { get; set; }
+    public AddressDto ShippingAddress { get; set; }
+    public AddressDto BillingAddress { get; set; }
+    public string PaymentMethod { get; set; }
+    public string PaymentStatus { get; set; }
+    public List<OrderItemDto> OrderItems { get; set; }
     public decimal TotalPrice { get; set; }
 }
