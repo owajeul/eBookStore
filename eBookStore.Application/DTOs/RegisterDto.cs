@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace eBookStore.Application.DTOs
 {
-    public class RegisterVM
+    public class RegisterDto
     {
         public string Name { get; set; }
         public string Email { get; set; }
