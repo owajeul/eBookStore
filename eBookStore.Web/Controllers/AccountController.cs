@@ -10,32 +10,30 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using eBookStore.Infrastructure.Services;
 
 namespace eBookStore.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
         private readonly ICartService _cartService;
         private readonly IUserService _userService;
+        private readonly IAuthService _authService;
         private readonly IMapper _mapper;
 
         public AccountController(
             ILogger<AccountController> logger,
             ICartService cartService,
             IUserService userService,
-            IMapper mapper,
-            SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager)
+            IAuthService authService,
+            IMapper mapper)
         {
             _logger = logger;
             _cartService = cartService;
             _userService = userService;
+            _authService = authService;
             _mapper = mapper;
-            _signInManager = signInManager;
-            _userManager = userManager;
         }
 
         public IActionResult Login(string returnUrl = null)
@@ -49,21 +47,17 @@ namespace eBookStore.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(loginVM.Email, loginVM.Password, loginVM.RememberMe, false);
+                var loginDto = _mapper.Map<LoginDto>(loginVM);  
+                var result = await _authService.LoginAsync(loginDto);
                 if (result.Succeeded)
                 {
                     TempData["ToastrMessage"] = "Login successful. Welcome back!";
                     TempData["ToastrType"] = "success";
-
-                    var user = await _userManager.FindByEmailAsync(loginVM.Email);
-
                     await MergeCartOnOrRegisterLogin();
                     return RedirectUser(loginVM.RedirectUrl);
                 }
-                _logger.LogWarning("Failed login attempt for {Email}.", loginVM.Email);
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
-
             return View(loginVM);
         }
         private IActionResult RedirectUser(string? redirectUrl)
@@ -83,11 +77,10 @@ namespace eBookStore.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = CreateApplicationUser(registerVM);
-                var result = await _userManager.CreateAsync(user, registerVM.Password);
+               var registerDto = _mapper.Map<RegisterDto>(registerVM);
+                var result = await _authService.RegisterAsync(registerDto);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
                     TempData["ToastrMessage"] = "Registration successful. Welcome!";
                     TempData["ToastrType"] = "success";
                     await MergeCartOnOrRegisterLogin();
@@ -96,28 +89,17 @@ namespace eBookStore.Web.Controllers
 
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ModelState.AddModelError(string.Empty, error);
                 }
             }
 
             return View(registerVM);
         }
 
-        private ApplicationUser CreateApplicationUser(RegisterVM registerVm)
-        {
-            return new ApplicationUser
-            {
-                UserName = registerVm.Email,
-                Email = registerVm.Email,
-                PhoneNumber = registerVm.PhoneNumber,
-                Name = registerVm.Name,
-                CreatedAt = DateTime.UtcNow
-            };
-        }
         public async Task<IActionResult> Logout()
         {
             var userName = User.Identity?.Name;
-            await _signInManager.SignOutAsync();
+            await _authService.LogoutAsync();
             TempData["ToastrMessage"] = $"Goodbye, {userName}. You have been logged out.";
             TempData["ToastrType"] = "success";
             return RedirectToAction("Index", "Home");
@@ -135,38 +117,19 @@ namespace eBookStore.Web.Controllers
 
         public async Task<IActionResult> GoogleResponse(string returnUrl = "/")
         {
-            var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (result?.Principal != null)
+            var result = await _authService.HandleGoogleLoginAsync();
+            if (result.Succeeded)
             {
-                var email = result.Principal.FindFirstValue(ClaimTypes.Email);
-                var name = result.Principal.FindFirstValue(ClaimTypes.Name);
-
-                var existingUser = await _userManager.FindByEmailAsync(email);
-
-                if (existingUser == null)
-                {
-                    var newUser = new ApplicationUser { UserName = email, Email = email, Name = name };
-
-                    var createResult = await _userManager.CreateAsync(newUser);
-
-                    if (createResult.Succeeded)
-                    {
-                        await _signInManager.SignInAsync(newUser, isPersistent: false);
-                    }
-                    else
-                    {
-                        return BadRequest("User registration failed.");
-                    }
-                }
-                else
-                {
-                    await _signInManager.SignInAsync(existingUser, isPersistent: false);
-                }
+                TempData["ToastrMessage"] = "Google login successful. Welcome!";
+                TempData["ToastrType"] = "success";
                 await MergeCartOnOrRegisterLogin();
                 return LocalRedirect(returnUrl);
             }
-
+            
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error);
+            }
             return BadRequest("Authentication failed.");
         }
 
@@ -180,7 +143,7 @@ namespace eBookStore.Web.Controllers
 
         private async Task MergeCartOnOrRegisterLogin()
         {
-            var userId = _userManager.GetUserId(User);
+            var userId = _userService.GetUserId();
             var sessionCart = GetSessionCart();
             var dbCart = await _cartService.GetUserCartAsync(userId);
             var sessionCartDto = _mapper.Map<CartDto>(sessionCart);

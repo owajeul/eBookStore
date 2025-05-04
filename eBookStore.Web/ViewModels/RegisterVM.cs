@@ -22,7 +22,8 @@ namespace eBookStore.Web.ViewModels
 
         [DisplayName("Phone number")]
         [Required]
-        public string ?PhoneNumber { get; set; }
+        [RegularExpression(@"^01[3-9]\d{8}$", ErrorMessage = "Enter a valid phone number.")]
+        public string PhoneNumber { get; set; }
         public string ?RedirectUrl { get; set; }
     }
 }
