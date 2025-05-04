@@ -9,5 +9,6 @@ public interface IOrderRepository : IRepository<Order>
     Task<List<Order>> GetOrdersByUserIdAsync(string userId);
     Task<Order?> GetOrderById(int id);
     Task<List<UserPurchaseReportDto>> GetUserPurchaseReportsAsync();
-    Task<Order> AddOrderAsync(Order order);
+    Task<int> AddOrderAsync(Order order);
+    Task<Order?> GetOrderWithAddressAsync(int orderId);
 }

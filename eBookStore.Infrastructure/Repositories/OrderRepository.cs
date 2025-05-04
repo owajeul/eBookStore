@@ -65,10 +65,22 @@ namespace eBookStore.Infrastructure.Repositories
             return reports;
         }
 
-        public async Task<Order> AddOrderAsync(Order order)
+        public async Task<int> AddOrderAsync(Order order)
         {
             await _dbContext.Orders.AddAsync(order);
-            return order;
+            await _dbContext.SaveChangesAsync();
+            return order.Id;
         }
+
+        public async Task<Order?> GetOrderWithAddressAsync(int orderId)
+        {
+            return await _dbContext.Orders
+                .Include(o => o.ShippingAddress)
+                .Include(o => o.BillingAddress)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Book)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
     }
 }

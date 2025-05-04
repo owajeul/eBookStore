@@ -32,12 +32,12 @@ public class OrderService : IOrderService
 
     public async Task PlaceOrderAsync(OrderDto orderDto, string userEmail)
     {
-        OrderDto? order = null;
+        var orderId = 0;
         try
         {
             await _unitOfWork.BeginTransactionAsync();
             await CheckStockAsync(orderDto);
-            order = await CreateOrderAsync(orderDto);
+            orderId = await CreateOrderAsync(orderDto);
             await _unitOfWork.Cart.ClearCartAsync(orderDto.UserId);
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitTransactionAsync();
@@ -47,8 +47,8 @@ public class OrderService : IOrderService
             await _unitOfWork.RollbackTransactionAsync();
             throw new OrderServiceException($"Failed to place order for user {orderDto?.UserId}", ex);
         }
-
-        await _orderNotificationService.SendOrderConfirmationEmailAsync(userEmail, order);
+        var order = await _unitOfWork.Order.GetOrderWithAddressAsync(orderId);
+        await _orderNotificationService.SendOrderConfirmationEmailAsync(userEmail, _mapper.Map<OrderDto>(order));
     }
     private async Task CheckStockAsync(OrderDto orderDto)
     {
@@ -59,12 +59,12 @@ public class OrderService : IOrderService
                 throw new OrderServiceException($"Not enough stock for book id: {book.Id} title:{book.Title}");
         }
     }
-    private async Task<OrderDto> CreateOrderAsync(OrderDto orderDto)
+    private async Task<int> CreateOrderAsync(OrderDto orderDto)
     {
         _unitOfWork.DetachAllEntities();
         var order = _mapper.Map<Order>(orderDto);
-        var savedOrder = await _unitOfWork.Order.AddOrderAsync(order);
-        return _mapper.Map<OrderDto>(savedOrder);
+        var savedOrderId = await _unitOfWork.Order.AddOrderAsync(order);
+        return savedOrderId;
     }
 
     public async Task<List<OrderDto>> GetUserOrdersAsync(string userId)
