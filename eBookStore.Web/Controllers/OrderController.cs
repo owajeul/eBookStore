@@ -112,10 +112,25 @@ public class OrderController : Controller
           orderDto.PaymentStatus = AppConstant.PaymentStatusPaid;
         }
 
-        await _orderService.PlaceOrderAsync(orderDto, user.Email);
+        var orderId = await _orderService.PlaceOrderAsync(orderDto, user.Email);
 
         TempData["ToastrMessage"] = "Order placed successfully.";
         TempData["ToastrType"] = "success";
-        return RedirectToAction("Index", "Home");
+
+
+        return RedirectToAction(nameof(ThankYou), new {orderId = orderId});
     }
+
+    public async Task<IActionResult> ThankYou(int orderId)
+    {
+        var order = await _orderService.GetOrderById(orderId);
+        var orderSuccessVm = new OrderSuccessVM
+        {
+            OrderId = order.Id,
+            OrderDate = order.OrderDate,
+            TotalPrice = order.TotalPrice,
+        };
+        return View(orderSuccessVm);
+    }
+
 }

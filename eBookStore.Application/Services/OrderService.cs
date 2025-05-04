@@ -30,7 +30,7 @@ public class OrderService : IOrderService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task PlaceOrderAsync(OrderDto orderDto, string userEmail)
+    public async Task<int> PlaceOrderAsync(OrderDto orderDto, string userEmail)
     {
         var orderId = 0;
         try
@@ -50,6 +50,7 @@ public class OrderService : IOrderService
         }
         var order = await _unitOfWork.Order.GetOrderWithAddressAsync(orderId);
         await _orderNotificationService.SendOrderConfirmationEmailAsync(userEmail, _mapper.Map<OrderDto>(order));
+        return orderId;
     }
     private async Task CheckStockAsync(OrderDto orderDto)
     {
