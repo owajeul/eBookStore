@@ -43,6 +43,10 @@ public class OrderService : IOrderService
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitTransactionAsync();
         }
+        catch(BookOutOfStockException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             await _unitOfWork.RollbackTransactionAsync();
@@ -58,7 +62,7 @@ public class OrderService : IOrderService
         {
             var book = await _unitOfWork.Book.Get(b => b.Id == item.BookId);
             if (book.Stock < item.Quantity)
-                throw new OrderServiceException($"Not enough stock for book id: {book.Id} title:{book.Title}");
+                throw new BookOutOfStockException($"Not enough stock for book id: {book.Id} title:{book.Title}");
         }
     }
     private async Task<int> CreateOrderAsync(OrderDto orderDto)
