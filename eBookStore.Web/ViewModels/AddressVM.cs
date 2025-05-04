@@ -8,8 +8,8 @@ public class AddressVM
     [Required]
     public string Name { get; set; }
     [Required]
-    [DisplayName("Address")]
-    public string Line { get; set; }
+    [DisplayName("Street address")]
+    public string StreetAddress { get; set; }
     [Required]
     public string City { get; set; }
     [Required]
