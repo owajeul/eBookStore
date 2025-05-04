@@ -179,6 +179,10 @@ public class BookService : IBookService
             await AddBookReviewOfUserAsync(bookId, rating, comment);
            await _unitOfWork.SaveAsync();
         }
+        catch(UserCanProvideOnlyOneBookReviewException)
+        {
+            throw;
+        }
         catch(Exception ex) when (!(ex is BookServiceException))
         {
             throw new BookServiceException($"Failed to review book with ID {bookId}", ex);
@@ -289,7 +293,7 @@ public class BookService : IBookService
         var review = await _unitOfWork.Book.GetBookReviewAsync(bookId, user.UserId);
         if (review != null)
         {
-            throw new BookServiceException($"User {user.UserId} has not already reviewed the book");
+            throw new UserCanProvideOnlyOneBookReviewException($"User with userId {user.UserId} already reviwed the book.");
         }
         var bookReview = new BookReview
         {
