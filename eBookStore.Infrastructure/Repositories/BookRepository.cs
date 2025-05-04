@@ -8,6 +8,7 @@ using eBookStore.Domain.Entities;
 using eBookStore.Infrastructure.Data;
 using eBookStore.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 
 namespace eBookStore.Infrastructure.Repositories;
 
@@ -47,4 +48,12 @@ public class BookRepository : Repository<Book>, IBookRepository
             .FirstOrDefaultAsync(b => b.Id == bookId);
     }
 
+    public async Task<List<string>> GetDistinctGenresAsync()
+    {
+        return await _dbContext.Books
+            .Where(b => b.Genre != null)
+            .Select(b => b.Genre)
+            .Distinct()
+            .ToListAsync();
+    }
 }

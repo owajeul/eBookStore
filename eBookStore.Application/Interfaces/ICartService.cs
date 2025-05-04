@@ -12,7 +12,5 @@ public interface ICartService
     Task AddQuantityAsync(int cartId, int bookId, int quantity);
     Task<bool> IsBookInCartAsync(string userId, int bookId);
     Task RemoveFromCartAsync(int cartId, int bookId);
-    void UpdateCart(Cart cart);
     Task MergeSessionCartWithDbCartAsync(string userId, CartDto? sessionCart, CartDto? dbCart);
-    Task MergeSessionCartItemsIntoDbCartAsync(string userId, int dbCartId, CartDto sessionCart);
 }

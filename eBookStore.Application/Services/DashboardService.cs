@@ -11,15 +11,13 @@ namespace eBookStore.Application.Services;
 
 public class DashboardService : IDashboardService
 {
-    private readonly IAdminRepository _adminRepository;
-    private readonly IMapper _mapper;
+    private readonly IUnitOfWork _unitOfWork;
     private const int LOW_STOCK_THRESHOLD = 5;
     private const int MAX_RECORDS_FOR_DASHBOARD = 10;
 
-    public DashboardService(IAdminRepository adminRepository, IMapper mapper)
+    public DashboardService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _adminRepository = adminRepository;
-        _mapper = mapper;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<AdminDashboardDto> GetAdminDashboardDataAsync()
@@ -36,10 +34,10 @@ public class DashboardService : IDashboardService
 
     private async Task<AdminDashboardDto> FetchAdminDashboardDataAsync()
     {
-        var totalUsers = await _adminRepository.GetTotalUsersCountAsync();
-        var totalOrders = await _adminRepository.GetTotalOrdersCountAsync();
-        var totalRevenue = await _adminRepository.GetTotalRevenueAsync();
-        var totalBooks = await _adminRepository.GetTotalBooksCountAsync();
+        var totalUsers = await _unitOfWork.Admin.GetTotalUsersCountAsync();
+        var totalOrders = await _unitOfWork.Admin.GetTotalOrdersCountAsync();
+        var totalRevenue = await _unitOfWork.Admin.GetTotalRevenueAsync();
+        var totalBooks = await _unitOfWork.Admin.GetTotalBooksCountAsync();
 
         return new AdminDashboardDto
         {

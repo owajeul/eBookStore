@@ -6,7 +6,6 @@ namespace eBookStore.Application.Interfaces;
 public interface IBookService
 {
     Task<List<BookDto>> GetAllBooksAsync();
-    Task<List<BookDto>> GetFilteredBooksAsync(BookFilterDto filter);
     Task<BookWithDescriptionDto> GetBookAsync(int id);
     Task<BookWithGenresDto> GetBooksWithGenresAsync();
     Task<BookStockAndSalesDto> GetBookStockAsync(int id);
