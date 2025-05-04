@@ -113,7 +113,7 @@
                                     </tr>
                                     <tr>
                                         <td colspan="3" class="text-end">Shipping</td>
-                                        <td>$5</td>
+                                        <td>$0</td>
                                     </tr>
                                     <tr>
                                         <td colspan="3" class="text-end fw-bold">Total</td>
@@ -135,13 +135,36 @@
                     <div class="card-body">
                         <div class="order-info-item">
                             <span class="customer-info-label">Address</span>
-                            <span class="customer-info-value">@Model.ShippingAddress</span>
+                            <span class="customer-info-value">@Model.ShippingAddress.StreetAddress</span>
                         </div>
                         <div class="order-info-item">
-                            <span class="customer-info-label">Method</span>
-                            <span class="customer-info-value">Standard Shipping</span>
+                            <span class="customer-info-label">Phone</span>
+                            <span class="customer-info-value">@Model.ShippingAddress.Phone</span>
                         </div>
-                        
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Post code</span>
+                            <span class="customer-info-value">@Model.ShippingAddress.PostCode</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Billing Information Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="bi bi-geo-alt me-2"></i>Billing Information
+                    </div>
+                    <div class="card-body">
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Address</span>
+                            <span class="customer-info-value">@Model.BillingAddress.StreetAddress</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Phone</span>
+                            <span class="customer-info-value">@Model.BillingAddress.Phone</span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="customer-info-label">Post code</span>
+                            <span class="customer-info-value">@Model.BillingAddress.PostCode</span>
+                        </div>
                     </div>
                 </div>
             </div>
