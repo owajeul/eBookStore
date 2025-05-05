@@ -1,0 +1,186 @@
+﻿@model OrderVM
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Order Lookup</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Agent" asp-action="FindOrder" method="post" class="d-flex">
+                        <input type="number" name="orderId" class="form-control" placeholder="Enter Order ID" min="1" required>
+                        <button type="submit" class="btn btn-primary ms-2">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </form>
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-3">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null && Model.Id > 0)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Order #@Model.Id</h3>
+                        <span class="badge rounded-pill bg-light text-dark">@Model.Status</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h5 class="text-muted">Order Information</h5>
+                                    <p class="mb-1"><strong>Date:</strong> @Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</p>
+                                    <p class="mb-1"><strong>Status:</strong> @Model.Status</p>
+                                    <p class="mb-1"><strong>User ID:</strong> @Model.UserId</p>
+                                    <p class="mb-1"><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+                                    <p class="mb-1"><strong>Payment Status:</strong> @Model.PaymentStatus</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <h5 class="text-muted">Shipping Address</h5>
+                                        @if (Model.ShippingAddress != null)
+                                        {
+                                            <address>
+                                                @Html.Raw(FormatAddress(Model.BillingAddress))
+                                            </address>
+                                        }
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <h5 class="text-muted">Billing Address</h5>
+                                        @if (Model.BillingAddress != null)
+                                        {
+                                            <address>
+                                                @Html.Raw(FormatAddress(Model.BillingAddress))
+                                            </address>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-0">Order Items</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.OrderItems != null && Model.OrderItems.Any())
+                                    {
+                                        foreach (var item in Model.OrderItems)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="ms-2">
+                                                            <p class="fw-bold mb-0">@item.Book.Title</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>@item.Quantity</td>
+                                                <td>@item.UnitPrice.ToString("C")</td>
+                                                <td class="text-end">@((item.UnitPrice * item.Quantity).ToString("C"))</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center py-3">No items in this order</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="fw-bold">
+                                    <tr>
+                                        <td colspan="3" class="text-end">Total:</td>
+                                        <td class="text-end">@Model.TotalPrice.ToString("C")</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left"></i> New Search
+                    </a>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Print Order
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    public string FormatAddress(AddressVM address)
+    {
+        if (address == null) return string.Empty;
+
+        var parts = new List<string>();
+
+        // Add name if available (assuming AddressDto might have these properties)
+        if (!string.IsNullOrWhiteSpace(address.Name))
+        {
+            parts.Add(address.Name);
+        }
+
+        // Add address line(s)
+        if (!string.IsNullOrWhiteSpace(address.StreetAddress))
+        {
+            parts.Add(address.StreetAddress);
+        }
+
+
+        // Add city, state, zip
+        var cityStateZip = new List<string>();
+        if (!string.IsNullOrWhiteSpace(address.City))
+        {
+            cityStateZip.Add(address.City);
+        }
+
+        
+
+        if (!string.IsNullOrWhiteSpace(address.PostCode))
+        {
+            cityStateZip.Add(address.PostCode);
+        }
+
+        if (cityStateZip.Count > 0)
+        {
+            parts.Add(string.Join(", ", cityStateZip));
+        }
+
+        return string.Join("<br>", parts);
+    }
+}

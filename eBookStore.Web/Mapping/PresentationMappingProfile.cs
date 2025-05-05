@@ -33,6 +33,7 @@ namespace eBookStore.Web.Mapping
             CreateMap<LoginVM, LoginDto>();
             CreateMap<RegisterVM, RegisterDto>();   
             CreateMap<AddressVM, AddressDto>();
+            CreateMap<AddressDto, AddressVM>();
         }
     }
 }
