@@ -200,9 +200,9 @@
                 var status = $(this).data('status');
 
                 if (status === 'all') {
-                    table.column(5).search('').draw();
+                    table.column(4).search('').draw();
                 } else {
-                    table.column(5).search(status).draw();
+                    table.column(4).search(status).draw();
                 }
 
                 $('.filter-status').removeClass('active');

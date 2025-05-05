@@ -173,37 +173,37 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            $("#paymentStatusSelect").val('@Model.PaymentStatus');
+        $("#paymentStatusSelect").val('@Model.PaymentStatus');
 
-            $("#savePaymentStatus").click(function() {
-                const newStatus = $("#paymentStatusSelect").val();
-                const orderId = @Model.Id;
+        $("#savePaymentStatus").click(function() {
+        const newStatus = $("#paymentStatusSelect").val();
+        const orderId = @Model.Id;
 
-                $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
-                $(this).prop('disabled', true);
+        $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+        $(this).prop('disabled', true);
 
-                $.ajax({
-                    url: 'Agent/UpdatePaymentStatus',
-                    type: 'POST',
-                     data: {
-                        orderId: orderId,
-                        paymentStatus: newStatus
-                    },
-                    success: function(response) {
-                        $("#paymentStatusText").text(newStatus);
-                        $("#paymentStatusBadge").text(newStatus);
-                        toastr.success("Payment status updated successfully");
-                        $("#updatePaymentModal").modal('hide');
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error("An error occured updading payment status");
-                    },
-                    complete: function() {
-                        $("#savePaymentStatus").html('Save Changes');
-                        $("#savePaymentStatus").prop('disabled', false);
-                    }
-                });
-            });
+        $.ajax({
+        url: 'Agent/UpdatePaymentStatus',
+        type: 'POST',
+        data: {
+        orderId: orderId,
+        paymentStatus: newStatus
+        },
+        success: function(response) {
+        $("#paymentStatusText").text(newStatus);
+        $("#paymentStatusBadge").text(newStatus);
+        toastr.success("Payment status updated successfully");
+        $("#updatePaymentModal").modal('hide');
+        },
+        error: function(xhr, status, error) {
+        toastr.error("An error occured updading payment status");
+        },
+        complete: function() {
+        $("#savePaymentStatus").html('Save Changes');
+        $("#savePaymentStatus").prop('disabled', false);
+        }
+        });
+        });
         });
     </script>
 }
@@ -236,6 +236,10 @@
         if (cityStateZip.Count > 0)
         {
             parts.Add(string.Join(", ", cityStateZip));
+        }
+        if(!string.IsNullOrEmpty(address.Phone))
+        {
+            parts.Add(address.Phone);
         }
         return string.Join("<br>", parts);
     }

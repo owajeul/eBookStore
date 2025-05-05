@@ -30,8 +30,13 @@
                                 <select asp-for="@Model.ShippingAddress.City" class="form-select" id="shipping-city" required>
                                     <option value="">Choose...</option>
                                     <option value="Dhaka">Dhaka</option>
+                                    <option value="Chattogram">Chattogram</option>
                                     <option value="Rajshahi">Rajshahi</option>
+                                    <option value="Khulna">Khulna</option>
+                                    <option value="Barishal">Barishal</option>
                                     <option value="Sylhet">Sylhet</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Mymensingh">Mymensingh</option>
                                 </select>
                                 <span asp-validation-for="@Model.ShippingAddress.City" class="text-danger"></span>
                             </div>
@@ -77,8 +82,14 @@
                                 <select asp-for="@Model.BillingAddress.City" class="form-select" id="billing-city" required>
                                     <option value="">Choose...</option>
                                     <option value="Dhaka">Dhaka</option>
+                                    <option value="Chattogram">Chattogram</option>
                                     <option value="Rajshahi">Rajshahi</option>
+                                    <option value="Khulna">Khulna</option>
+                                    <option value="Barishal">Barishal</option>
                                     <option value="Sylhet">Sylhet</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Mymensingh">Mymensingh</option>
+
                                 </select>
                                 <span asp-validation-for="@Model.BillingAddress.City" class="text-danger"></span>
                             </div>
