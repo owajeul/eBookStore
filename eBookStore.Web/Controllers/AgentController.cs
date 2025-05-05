@@ -2,8 +2,10 @@
 using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.Interfaces;
 using eBookStore.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize(Roles = "Agent, Admin")]
 public class AgentController : Controller
 {
     private readonly IOrderService _orderService;

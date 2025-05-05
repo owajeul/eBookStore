@@ -53,6 +53,10 @@ namespace eBookStore.Web.Controllers
                 {
                     TempData["ToastrMessage"] = "Login successful. Welcome back!";
                     TempData["ToastrType"] = "success";
+                    if(await _userService.IsUserInRoleAsync(_userService.GetUserId(), AppConstant.Role_Agent))
+                    {
+                        return RedirectToAction("Index", "Agent");
+                    }
                     await MergeCartOnOrRegisterLogin();
                     return RedirectUser(loginVM.RedirectUrl);
                 }

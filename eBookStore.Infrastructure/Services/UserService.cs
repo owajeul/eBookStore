@@ -90,6 +90,12 @@ public class UserService : IUserService
 
     }
 
+    public async Task<bool> IsUserInRoleAsync(string userId, string role)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) throw new NotFoundException("User not found");
+        return await _userManager.IsInRoleAsync(user, role);
+    }
 
 }
 
