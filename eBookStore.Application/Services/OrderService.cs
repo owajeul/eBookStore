@@ -43,7 +43,7 @@ public class OrderService : IOrderService
             await _unitOfWork.SaveAsync();
             await _unitOfWork.CommitTransactionAsync();
         }
-        catch(BookOutOfStockException)
+        catch (BookOutOfStockException)
         {
             throw;
         }
@@ -139,7 +139,7 @@ public class OrderService : IOrderService
     }
     private async Task<OrderDto> FetchOrderByIdAsync(int id)
     {
-        var order = await _unitOfWork.Order.GetOrderById(id);
+        var order = await _unitOfWork.Order.GetOrderWithAddressAsync(id);
         if (order == null)
             throw new OrderNotFoundException($"Order with ID {id} not found");
         return _mapper.Map<OrderDto>(order);
@@ -167,5 +167,32 @@ public class OrderService : IOrderService
 
         order.Status = orderStatus;
         _unitOfWork.Order.Update(order);
+        await _unitOfWork.SaveAsync();
+    }
+
+    public async Task ChangePaymentStatus(int orderId, string paymentStatus)
+    {
+        try
+        {
+            InputValidator.ValidateOrderId(orderId);
+            InputValidator.ValidatePaymentStatus(paymentStatus);
+            await UpdatePaymentStatusAsync(orderId, paymentStatus);
+            await _unitOfWork.SaveAsync();
+        }
+        catch (Exception ex) when (!(ex is OrderServiceException))
+        {
+            throw new OrderServiceException($"Failed to change status for order {orderId} to {paymentStatus}", ex);
+        }
+    }
+
+    private async Task UpdatePaymentStatusAsync(int orderId, string paymentStatus)
+    {
+        var order = await _unitOfWork.Order.Get(o => o.Id == orderId);
+        if (order == null)
+            throw new OrderNotFoundException($"Order with ID {orderId} not found");
+
+        order.PaymentStatus = paymentStatus;
+        _unitOfWork.Order.Update(order);
+        await _unitOfWork.SaveAsync();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.Interfaces;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -18,27 +19,33 @@ public class AgentController : Controller
     {
         if (orderId.HasValue)
         {
-            // Fetch the order if an ID is provided
             var order = await _orderService.GetOrderById(orderId.Value);
             var orderVm = _mapper.Map<OrderVM>(order);
+            if(orderVm.PaymentMethod == AppConstant.PaymentMethodCreditCard)
+            {
+                return View(new OrderVM());
+            }
             return View(orderVm);
         }
-
-        // No order ID provided or order not found
         return View(new OrderVM());
     }
 
     [HttpPost]
-    public async Task<IActionResult> FindOrder(int orderId)
+    public IActionResult FindOrder(int orderId)
     {
-        // Redirect to the Index action with the orderId parameter
         return RedirectToAction("Index", new { orderId });
     }
-
-    public async Task<IActionResult> Order()
+    [HttpPost]
+    public async Task<IActionResult> UpdatePaymentStatus(int orderId, string paymentStatus)
     {
-        // This could be used for creating a new order
-        var orderVm = new OrderVM();
-        return View(orderVm);
+        try
+        {
+            await _orderService.ChangePaymentStatus(orderId, paymentStatus);
+            return Ok();
+        }
+        catch(Exception)
+        {
+            return BadRequest("Failed to update payment status");
+        }
     }
 }

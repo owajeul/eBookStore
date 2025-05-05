@@ -10,4 +10,5 @@ public interface IOrderService
     Task<List<OrderDto>> GetAllOrdersAsync();
     Task<OrderDto> GetOrderById(int id);
     Task ChangeOrderStatus(int orderId, string orderStatus);
+    Task ChangePaymentStatus(int orderId, string paymentStatus);
 }

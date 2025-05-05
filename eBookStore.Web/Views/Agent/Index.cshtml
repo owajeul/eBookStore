@@ -1,5 +1,6 @@
 ﻿@model OrderVM
 @{
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Order Details";
 }
 
@@ -17,13 +18,7 @@
                             <i class="bi bi-search"></i> Search
                         </button>
                     </form>
-
-                    @if (TempData["ErrorMessage"] != null)
-                    {
-                        <div class="alert alert-danger mt-3">
-                            @TempData["ErrorMessage"]
-                        </div>
-                    }
+                    <small class="text-muted">Can only view order with payment method Cash On Delivery.</small>
                 </div>
             </div>
         </div>
@@ -36,7 +31,9 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h3 class="mb-0">Order #@Model.Id</h3>
-                        <span class="badge rounded-pill bg-light text-dark">@Model.Status</span>
+                        <div>
+                            Payment: <span class="badge rounded-pill bg-light text-dark px-2"><span id="paymentStatusBadge">@Model.PaymentStatus</span></span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -47,7 +44,13 @@
                                     <p class="mb-1"><strong>Status:</strong> @Model.Status</p>
                                     <p class="mb-1"><strong>User ID:</strong> @Model.UserId</p>
                                     <p class="mb-1"><strong>Payment Method:</strong> @Model.PaymentMethod</p>
-                                    <p class="mb-1"><strong>Payment Status:</strong> @Model.PaymentStatus</p>
+                                    <p class="mb-1">
+                                        <strong>Payment Status:</strong> 
+                                        <span id="paymentStatusText">@Model.PaymentStatus</span>
+                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#updatePaymentModal">
+                                            <i class="bi bi-pencil"></i> Update
+                                        </button>
+                                    </p>
                                 </div>
                             </div>
 
@@ -58,7 +61,7 @@
                                         @if (Model.ShippingAddress != null)
                                         {
                                             <address>
-                                                @Html.Raw(FormatAddress(Model.BillingAddress))
+                                                @Html.Raw(FormatAddress(Model.ShippingAddress))
                                             </address>
                                         }
                                     </div>
@@ -139,8 +142,71 @@
                 </div>
             </div>
         </div>
+
+        <!-- Payment Status Update Modal -->
+        <div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updatePaymentModalLabel">Update Payment Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="paymentStatusSelect" class="form-label">Payment Status</label>
+                            <select class="form-select" id="paymentStatusSelect">
+                                <option value="Pending" selected>Pending</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="savePaymentStatus">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $("#paymentStatusSelect").val('@Model.PaymentStatus');
+
+            $("#savePaymentStatus").click(function() {
+                const newStatus = $("#paymentStatusSelect").val();
+                const orderId = @Model.Id;
+
+                $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+                $(this).prop('disabled', true);
+
+                $.ajax({
+                    url: 'Agent/UpdatePaymentStatus',
+                    type: 'POST',
+                     data: {
+                        orderId: orderId,
+                        paymentStatus: newStatus
+                    },
+                    success: function(response) {
+                        $("#paymentStatusText").text(newStatus);
+                        $("#paymentStatusBadge").text(newStatus);
+                        toastr.success("Payment status updated successfully");
+                        $("#updatePaymentModal").modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error("An error occured updading payment status");
+                    },
+                    complete: function() {
+                        $("#savePaymentStatus").html('Save Changes');
+                        $("#savePaymentStatus").prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}
 
 @functions {
     public string FormatAddress(AddressVM address)
@@ -148,28 +214,19 @@
         if (address == null) return string.Empty;
 
         var parts = new List<string>();
-
-        // Add name if available (assuming AddressDto might have these properties)
         if (!string.IsNullOrWhiteSpace(address.Name))
         {
             parts.Add(address.Name);
         }
-
-        // Add address line(s)
         if (!string.IsNullOrWhiteSpace(address.StreetAddress))
         {
             parts.Add(address.StreetAddress);
         }
-
-
-        // Add city, state, zip
         var cityStateZip = new List<string>();
         if (!string.IsNullOrWhiteSpace(address.City))
         {
             cityStateZip.Add(address.City);
         }
-
-        
 
         if (!string.IsNullOrWhiteSpace(address.PostCode))
         {
@@ -180,7 +237,6 @@
         {
             parts.Add(string.Join(", ", cityStateZip));
         }
-
         return string.Join("<br>", parts);
     }
 }

@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Admin Panel</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
     <link rel="stylesheet" href="~/css/adminSite.css"/>
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -36,6 +37,13 @@
                    class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "AdminBook" ? "active" : "")">
                     <i class="bi bi-cart3"></i>
                     Books
+                </a>
+            </li>
+            <li class="nav-item">
+                <a asp-action="" asp-controller="Agent"
+                   class="nav-link @(ViewContext.RouteData.Values["Controller"].ToString() == "Agent" ? "active" : "")">
+                    <i class="bi bi-cart3"></i>
+                    Agent
                 </a>
             </li>
             <div class="nav-divider"></div>
@@ -74,6 +82,8 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#sidebarToggle').on('click', function() {
