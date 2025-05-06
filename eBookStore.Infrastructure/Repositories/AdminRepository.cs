@@ -31,7 +31,9 @@ namespace eBookStore.Infrastructure.Repositories
 
         public async Task<decimal> GetTotalRevenueAsync()
         {
-            return await _dbContext.Orders.SumAsync(o => o.TotalPrice);
+            return await _dbContext.Orders
+                .Where(o => o.PaymentStatus == AppConstant.PaymentStatusPaid)
+                .SumAsync(o => o.TotalPrice);
         }
 
         public async Task<int> GetTotalBooksCountAsync()

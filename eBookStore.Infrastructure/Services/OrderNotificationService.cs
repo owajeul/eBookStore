@@ -34,7 +34,6 @@ public class OrderNotificationService : IOrderNotificationService
         {
             string subject = $"Order Confirmation #{order.Id}";
             string htmlMessage = GenerateOrderConfirmationEmail(order);
-
             await _emailService.SendEmailAsync(email, subject, htmlMessage);
 
         }
@@ -46,121 +45,135 @@ public class OrderNotificationService : IOrderNotificationService
 
     private string GenerateOrderConfirmationEmail(OrderDto order)
     {
-        string formattedDate = order.OrderDate.ToString("MMMM dd, yyyy at h:mm tt");
+        string formattedDate = order.OrderDate.ToString("MMMM dd, yyyy 'at' h:mm tt");
 
         var emailContent = $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset='utf-8'>
-                <title>Order Confirmation</title>
-                <style>
-                    body {{
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        color: #333;
-                        max-width: 600px;
-                        margin: 0 auto;
-                    }}
-                    .header {{
-                        background-color: #4CAF50;
-                        color: white;
-                        padding: 15px;
-                        text-align: center;
-                    }}
-                    .content {{
-                        padding: 20px;
-                    }}
-                    .order-details {{
-                        margin-bottom: 20px;
-                    }}
-                    .order-items {{
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 20px;
-                    }}
-                    .order-items th, .order-items td {{
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        text-align: left;
-                    }}
-                    .order-items th {{
-                        background-color: #f2f2f2;
-                    }}
-                    .total {{
-                        font-weight: bold;
-                        text-align: right;
-                    }}
-                    .footer {{
-                        background-color: #f1f1f1;
-                        padding: 10px;
-                        text-align: center;
-                        font-size: 12px;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class='header'>
-                    <h1>Thank You for Your Order!</h1>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='utf-8'>
+            <title>Order Confirmation</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    max-width: 600px;
+                    margin: 0 auto;
+                }}
+                .header {{
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 15px;
+                    text-align: center;
+                }}
+                .content {{
+                    padding: 20px;
+                }}
+                .order-details {{
+                    margin-bottom: 20px;
+                }}
+                .order-items {{
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                }}
+                .order-items th, .order-items td {{
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    text-align: left;
+                }}
+                .order-items th {{
+                    background-color: #f2f2f2;
+                }}
+                .total {{
+                    font-weight: bold;
+                    text-align: right;
+                }}
+                .footer {{
+                    background-color: #f1f1f1;
+                    padding: 10px;
+                    text-align: center;
+                    font-size: 12px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class='header'>
+                <h1>Thank You for Your Order!</h1>
+            </div>
+            <div class='content'>
+                <p>Dear Customer,</p>
+                <p>We're pleased to confirm that we've received your order. Below are the details of your purchase:</p>
+                
+                <div class='order-details'>
+                    <h2>Order Information</h2>
+                    <p><strong>Order Number:</strong> #{order.Id}</p>
+                    <p><strong>Order Date:</strong> {formattedDate}</p>
+                    <p><strong>Status:</strong> {order.Status}</p>
                 </div>
-                <div class='content'>
-                    <p>Dear Customer,</p>
-                    <p>We're pleased to confirm that we've received your order. Below are the details of your purchase:</p>
-                    
-                    <div class='order-details'>
-                        <h2>Order Information</h2>
-                        <p><strong>Order Number:</strong> #{order.Id}</p>
-                        <p><strong>Order Date:</strong> {formattedDate}</p>
-                        <p><strong>Status:</strong> {order.Status}</p>
-                        <p><strong>Shipping Address:</strong> {order.ShippingAddress}</p>
-                        <p><strong>Contact Number:</strong> {order.PhoneNumber}</p>
-                    </div>
-                    
-                    <h2>Order Summary</h2>
-                    <table class='order-items'>
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Quantity</th>
-                                <th>Unit Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            ";
+
+                <h2>Shipping Address</h2>
+                <p>
+                    {order.ShippingAddress?.Name}<br />
+                    {order.ShippingAddress?.StreetAddress}<br />
+                    {order.ShippingAddress?.City} - {order.ShippingAddress?.PostCode}<br />
+                    Phone: {order.ShippingAddress?.Phone}
+                </p>
+
+                <h2>Billing Address</h2>
+                <p>
+                    {order.BillingAddress?.Name}<br />
+                    {order.BillingAddress?.StreetAddress}<br />
+                    {order.BillingAddress?.City} - {order.BillingAddress?.PostCode}<br />
+                    Phone: {order.BillingAddress?.Phone}
+                </p>
+
+                <h2>Order Summary</h2>
+                <table class='order-items'>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>";
 
         foreach (var item in order.OrderItems)
         {
             decimal itemTotal = item.UnitPrice * item.Quantity;
             emailContent += $@"
-                            <tr>
-                                <td>{item.Book.Title}</td>
-                                <td>{item.Quantity}</td>
-                                <td>${item.UnitPrice.ToString("F2")}</td>
-                                <td>${itemTotal.ToString("F2")}</td>
-                            </tr>";
+                        <tr>
+                            <td>{item.Book.Title}</td>
+                            <td>{item.Quantity}</td>
+                            <td>${item.UnitPrice:F2}</td>
+                            <td>${itemTotal:F2}</td>
+                        </tr>";
         }
 
         emailContent += $@"
-                        </tbody>
-                    </table>
-                    
-                    <div class='total'>
-                        <p>Total Amount: ${order.TotalPrice.ToString("F2")}</p>
-                    </div>
-                    
-                    <p>We're preparing your order for shipment and will notify you once it's on its way.</p>
-                    <p>If you have any questions about your order, please contact our customer service at {_configuration["CompanyInfo:SupportEmail"]} or call us at {_configuration["CompanyInfo:SupportPhone"]}.</p>
-                    
-                    <p>Thank you for shopping with us!</p>
+                    </tbody>
+                </table>
+                
+                <div class='total'>
+                    <p>Total Amount: ${order.TotalPrice:F2}</p>
                 </div>
-                <div class='footer'>
-                    <p>&copy; {DateTime.Now.Year} {_configuration["CompanyInfo:Name"]}. All rights reserved.</p>
-                    <p>This email was sent to confirm your recent order. Please do not reply to this email.</p>
-                </div>
-            </body>
-            </html>";
+                
+                <p>We're preparing your order for shipment and will notify you once it's on its way.</p>
+                <p>If you have any questions about your order, please contact our customer service at {_configuration["CompanyInfo:SupportEmail"]} or call us at {_configuration["CompanyInfo:SupportPhone"]}.</p>
+                
+                <p>Thank you for shopping with us!</p>
+            </div>
+            <div class='footer'>
+                <p>&copy; {DateTime.Now.Year} {_configuration["CompanyInfo:Name"]}. All rights reserved.</p>
+                <p>This email was sent to confirm your recent order. Please do not reply to this email.</p>
+            </div>
+        </body>
+        </html>";
 
         return emailContent;
     }
+
 }

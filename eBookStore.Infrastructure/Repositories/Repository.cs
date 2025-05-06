@@ -27,6 +27,7 @@ public class Repository<T> :IRepository<T> where T : class
         if (filter != null)
         {
             query = query.Where(filter);
+            query = query.AsNoTracking();
         }
         return query.ToListAsync();
     }

@@ -47,6 +47,23 @@ namespace eBookStore.Infrastructure.Data
                         await _userManager.AddToRoleAsync(user, AppConstant.Role_Admin);
                     }
                 }
+                if (!await _roleManager.RoleExistsAsync(AppConstant.Role_Agent))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole { Name = AppConstant.Role_Agent });
+                    await _userManager.CreateAsync(new ApplicationUser
+                    {
+                        Name = "Agent",
+                        UserName = "agent@gmail.com",
+                        Email = "agent@gmail.com"
+                    }, "zaq123");
+
+                    var user = await _userManager.FindByEmailAsync("agent@gmail.com");
+
+                    if (user != null)
+                    {
+                        await _userManager.AddToRoleAsync(user, AppConstant.Role_Agent);
+                    }
+                }
             }
             catch (Exception ex)
             {

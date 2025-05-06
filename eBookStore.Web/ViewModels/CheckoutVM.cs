@@ -2,18 +2,15 @@
 using eBookStore.Domain.Entities;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace eBookStore.Web.ViewModels
+namespace eBookStore.Web.ViewModels;
+
+public class CheckoutVM
 {
-    public class CheckoutVM
-    {
-        [Required]
-        [Display(Name = "Shipping address")]
-        public string ShippingAddress { get; set; }
-        [Required]
-        [Display(Name = "Phone number")]
-        [RegularExpression(@"^01[3-9]\d{8}$", ErrorMessage = "Enter a valid phone number.")]
-        public string PhoneNumber { get; set; }
-        [ValidateNever]
-        public List<CartItemVM> Items { get; set; }
-    }
+    [Display(Name = "Shipping address")]
+    public AddressVM ShippingAddress { get; set; }
+    public AddressVM BillingAddress { get; set; }
+    public bool BillingSameAsShipping { get; set; }
+    public PaymentVM Payment { get; set; }
+    [ValidateNever]
+    public List<CartItemVM> Items { get; set; }
 }

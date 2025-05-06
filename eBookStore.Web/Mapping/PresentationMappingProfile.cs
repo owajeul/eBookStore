@@ -25,13 +25,15 @@ namespace eBookStore.Web.Mapping
             CreateMap<BookVM, BookDto>();
             CreateMap<BookVM, BookWithDescriptionDto>();
             CreateMap<OrderDto, OrderVM>();
-            CreateMap<OrderVM, OrderVM>();
+            CreateMap<OrderVM, OrderDto>();
             CreateMap<OrderItemDto, OrderItemVM>();
             CreateMap<OrderItemVM, OrderItemDto>();
             CreateMap<BookWithReviewsDto, BookWithReviewsVM>();
             CreateMap<BookReviewDto, BookReviewVM>();
             CreateMap<LoginVM, LoginDto>();
             CreateMap<RegisterVM, RegisterDto>();   
+            CreateMap<AddressVM, AddressDto>();
+            CreateMap<AddressDto, AddressVM>();
         }
     }
 }

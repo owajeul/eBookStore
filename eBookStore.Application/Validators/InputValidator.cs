@@ -61,6 +61,11 @@ namespace eBookStore.Application.Validators
             if (!AppConstant.ValidStatuses.Contains(status))
                 throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", AppConstant.ValidStatuses)}", nameof(status));
         }
+        public static void ValidatePaymentStatus(string status)
+        {
+            if (status != AppConstant.PaymentStatusPaid && status != AppConstant.PaymentStatusPending)
+                throw new ArgumentException($"Invalid payment status: {status}");
+        }
 
     }
 }

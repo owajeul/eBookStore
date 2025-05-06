@@ -243,11 +243,20 @@
                 type: "POST",
                 data: { bookId: bookId, rating: rating, comment: comment },
                 success: function (response) {
-                    toastr["success"](response.message);
+                    toastr.success("Review added successfully.");
                     appendReview(response);
                 },
-                error: function () {
-                    toastr.error("An error occurred. Please try again later.");
+                error: function (xhr, status, error) {
+                    console.log(xhr, error);
+                    if (xhr.status === 401) {
+                        toastr.warning("You need to login to add a review.");
+                    }
+                    else if(xhr.status == 400) {
+                        toastr.warning(xhr.responseText);
+                    }
+                    else {
+                        toastr.error("An error occurred. Please try again later.");
+                    }
                 }
             });
             resetReviewForm();

@@ -51,6 +51,12 @@ public class HomeController : Controller
             model.Title = "Book Not Found";
             model.Message = UserFriendlyErrorMessages.BookNotFoundError;
         }
+        else if(exception is BookOutOfStockException)
+        {
+            model.StatusCode = 400;
+            model.Title = "Book Out of Stock";
+            model.Message = UserFriendlyErrorMessages.BookOutOfStockError;
+        }
         else if (exception is OrderNotFoundException)
         {
             model.StatusCode = 404;
@@ -67,8 +73,6 @@ public class HomeController : Controller
         {
             model.Message = UserFriendlyErrorMessages.GeneralError;
         }
-
-
         return View("Error", model);
     }
 

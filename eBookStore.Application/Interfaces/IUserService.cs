@@ -14,5 +14,6 @@ namespace eBookStore.Application.Interfaces
         Task<ProfileDto> GetUserProfileDataAsync();
         string GetUserId();
         Task UpdateUserProfileAsync(UserDto userDto);
+        Task<bool> IsUserInRoleAsync(string userId, string role);
     }
 }

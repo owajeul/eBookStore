@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eBookStore.Application.Common.Utilily;
 using eBookStore.Application.DTOs;
 using eBookStore.Application.Interfaces;
 using eBookStore.Application.Services;
@@ -42,8 +43,6 @@ public class OrderController : Controller
 
         var viewModel = new CheckoutVM
         {
-            ShippingAddress = "",
-            PhoneNumber = "",
             Items = _mapper.Map<List<CartItemVM>>(cart.CartItems)
         };
 
@@ -54,6 +53,18 @@ public class OrderController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceOrder(CheckoutVM model)
     {
+        if (model.Payment.Method == AppConstant.PaymentMethodCOD)
+        {
+            var cardPaymentErrors = ModelState.Keys
+                .Where(k => k.StartsWith("Payment.CardPayment."))
+                .ToList();
+
+            foreach (var error in cardPaymentErrors)
+            {
+                ModelState.Remove(error);
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             TempData["ToastrMessage"] = "Please fill in all required fields.";
@@ -74,8 +85,12 @@ public class OrderController : Controller
         var orderDto = new OrderDto
         {
             UserId = user.UserId,
-            ShippingAddress = model.ShippingAddress,
-            PhoneNumber = model.PhoneNumber,
+            OrderDate = DateTime.UtcNow,
+            ShippingAddress = _mapper.Map<AddressDto>(model.ShippingAddress),
+            BillingAddress = _mapper.Map<AddressDto>(model.BillingAddress),
+            PaymentMethod = model.Payment.Method,
+            PaymentStatus = AppConstant.PaymentStatusPending,
+            Status = AppConstant.StatusPending,
             OrderItems = cart.CartItems.Select(ci => new OrderItemDto
             {
                 BookId = ci.BookId,
@@ -92,10 +107,30 @@ public class OrderController : Controller
             }).ToList()
         };
 
-        await _orderService.PlaceOrderAsync(orderDto, user.Email);
+        if(model.Payment.Method == AppConstant.PaymentMethodCreditCard)
+        {
+          orderDto.PaymentStatus = AppConstant.PaymentStatusPaid;
+        }
+
+        var orderId = await _orderService.PlaceOrderAsync(orderDto, user.Email);
 
         TempData["ToastrMessage"] = "Order placed successfully.";
         TempData["ToastrType"] = "success";
-        return RedirectToAction("Index", "Home");
+
+
+        return RedirectToAction(nameof(ThankYou), new {orderId = orderId});
     }
+
+    public async Task<IActionResult> ThankYou(int orderId)
+    {
+        var order = await _orderService.GetOrderById(orderId);
+        var orderSuccessVm = new OrderSuccessVM
+        {
+            OrderId = order.Id,
+            OrderDate = order.OrderDate,
+            TotalPrice = order.TotalPrice,
+        };
+        return View(orderSuccessVm);
+    }
+
 }

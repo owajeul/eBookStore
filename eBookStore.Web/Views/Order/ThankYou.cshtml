@@ -1,0 +1,35 @@
+﻿@model OrderSuccessVM
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4 text-success">
+                        <i class="bi bi-check-circle-fill" style="font-size: 3rem;"></i>
+                    </div>
+                    <h2 class="card-title mb-3">Thank You for Your Order!</h2>
+                    <p class="lead">We've received your order and will begin processing it soon.</p>
+
+                    <div class="mt-4 text-start">
+                        <p><strong>Order Number:</strong> #@Model.OrderId</p>
+                        <p><strong>Order Date:</strong> @Model.OrderDate.ToString("MMMM dd, yyyy")</p>
+                        <p><strong>Total Amount:</strong> $@Model.TotalPrice.ToString("F2")</p>
+                    </div>
+
+                    <div class="mt-5">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                            <i class="bi bi-arrow-left"></i> Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center text-muted small mt-4">
+                A confirmation email has been sent to your email address.
+            </div>
+        </div>
+    </div>
+</div>

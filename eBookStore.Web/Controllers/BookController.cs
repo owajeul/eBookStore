@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eBookStore.Application.Common.Exceptions;
 using eBookStore.Application.Interfaces;
 using eBookStore.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,14 @@ public class BookController : Controller
         {
             return BadRequest("You must purchase the book before reviewing it.");
         }
-       await _bookService.ReviewBookAsync(bookId, rating, comment);
+        try
+        {
+            await _bookService.ReviewBookAsync(bookId, rating, comment);
+        }
+        catch(UserCanProvideOnlyOneBookReviewException ex)
+        {
+            return BadRequest("You can provide only one review in a book.");
+        }
         var review = await _bookService.GetBookReviewOfCurrentUserAsync(bookId);
        return Ok(review);
     }
