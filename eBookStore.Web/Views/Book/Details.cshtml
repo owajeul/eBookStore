@@ -173,37 +173,37 @@
                     @await Html.PartialAsync("_AddReviewPartial", Model.Id)
 
                     <!-- Review List -->
-                    @if(Model.ReviewCount > 0)
-                    {
                         <div class="card border-0 shadow-sm rounded-4 mb-4">
-                            <div class="card-body">
-                                <div class="d-flex mb-3">
-                                    <div class="flex-shrink-0">
-                                        <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">A</div>
-                                    </div>
-                                    @foreach(var review in Model.Reviews)
-                                    {
-                                        <div class="flex-grow-1 ms-3">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <h6 class="mb-0 fw-bold">@review.UserName</h6>
-                                                <span class="text-warning">
-                                                    @for(var star = 0;star < review.Rating;star++)
-                                                    {
-                                                
-                                                        <i class="bi bi-star-fill"></i>
-                                                    }
-                                                </span>
-                                            </div>
-                                            <p class="text-muted small mb-2">@review.CreatedAt</p>
-                                            <p class="mb-0">@review.Comment</p>
+                            <div class="card-body" id="reviewList">
+                                @if(Model.ReviewCount > 0)
+                                {
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">A</div>
                                         </div>
-                                    }
-                                </div>
-                                <hr>
+                                        @foreach(var review in Model.Reviews)
+                                        {
+                                            <div class="flex-grow-1 ms-3">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0 fw-bold">@review.UserName</h6>
+                                                    <span class="text-warning">
+                                                        @for(var star = 0;star < review.Rating;star++)
+                                                        {
+                                                
+                                                            <i class="bi bi-star-fill"></i>
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <p class="text-muted small mb-2">@review.CreatedAt.ToString("dd/mm/yyyy")</p>
+                                                <p class="mb-0">@review.Comment</p>
+                                            </div>
+                                        }
+                                    </div>
+                                    <hr>
+                                }
                             </div>
                         </div>
                         
-                    }
                 </div>
             </div>
         </div>
@@ -274,7 +274,8 @@
         }
 
         function appendReview(review) {
-                    console.log(review);
+             var date = new Date(review.createdAt);
+             var formattedDate = new Intl.DateTimeFormat('en-GB').format(date);
             const newReview = `
                 <div class="d-flex mb-3">
                     <div class="flex-shrink-0">
@@ -289,14 +290,14 @@
                                 ${renderStars(review.rating)}
                             </span>
                         </div>
-                        <p class="text-muted small mb-2">${review.createdAt}</p>
+                        <p class="text-muted small mb-2">${formattedDate}</p>
                         <p class="mb-0">${review.comment}</p>
                     </div>
                 </div>
                 <hr>
             `;
 
-            $(".card-body").first().append(newReview);
+            $("#reviewList").append(newReview);
         }
 
         function renderStars(rating) {
