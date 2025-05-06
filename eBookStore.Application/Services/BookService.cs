@@ -58,6 +58,10 @@ public class BookService : IBookService
             InputValidator.ValidateBookId(id);
             return await FetchBookByIdAsync(id);
         }
+        catch(BookNotFoundException)
+        {
+            throw;
+        }
         catch (Exception ex) when (!(ex is BookServiceException))
         {
             throw new BookServiceException($"Failed to retrieve book with ID {id}", ex);
@@ -95,6 +99,10 @@ public class BookService : IBookService
         {
             InputValidator.ValidateBookId(bookId);
             return await FetchBookWithReviewsAsync(bookId);
+        }
+        catch(BookNotFoundException)
+        {
+            throw;
         }
         catch (Exception ex) when (!(ex is BookServiceException))
         {

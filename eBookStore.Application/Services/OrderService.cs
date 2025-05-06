@@ -132,6 +132,10 @@ public class OrderService : IOrderService
             InputValidator.ValidateOrderId(id);
             return await FetchOrderByIdAsync(id);
         }
+        catch(OrderNotFoundException)
+        {
+            throw;
+        }
         catch (Exception ex) when (!(ex is OrderServiceException))
         {
             throw new OrderServiceException($"Failed to retrieve order with ID {id}", ex);

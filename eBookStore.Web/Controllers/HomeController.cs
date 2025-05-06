@@ -71,7 +71,16 @@ public class HomeController : Controller
         }
         else if (exception is BookServiceException || exception is CartServiceException || exception is OrderServiceException)
         {
-            model.Message = UserFriendlyErrorMessages.GeneralError;
+            if (exception.InnerException is ArgumentException)
+            {
+                model.StatusCode = 400;
+                model.Title = "Invalid Request";
+                model.Message = UserFriendlyErrorMessages.ArgumentError;
+            }
+            else
+            {
+                model.Message = UserFriendlyErrorMessages.GeneralError;
+            }
         }
         return View("Error", model);
     }
